@@ -47,7 +47,7 @@
     .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); transform: translateX(-100%); transition: transform 0.5s; }
     .btn:hover::after { transform: translateX(100%); }
     .clear-wrap { position: relative; margin-top: 4px; }
-    .btn-clear { width: 100%; padding: 11px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.06); color: #cbd5e1; letter-spacing: 0.4px; transition: background 0.2s, border-color 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-clear { width: 100%; padding: 11px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.06); color: #cbd5e1; letter-spacing: 0.4px; transition: background 0.2s, border-color 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
     .btn-clear:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); }
     .btn-clear:active { transform: scale(0.98); }
     .btn-clear .chevron { font-size: 10px; transition: transform 0.2s; }
@@ -55,10 +55,11 @@
     .clear-menu { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: rgba(30,27,55,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 5; opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; }
     .clear-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .clear-menu button { width: 100%; text-align: left; padding: 9px 12px; background: transparent; border: none; border-radius: 8px; color: #e0e0e0; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; }
-    .clear-menu button:hover { background: rgba(167,139,250,0.18); color: #fff; }
+    .clear-menu button:hover, .clear-menu button.hot { background: rgba(167,139,250,0.18); color: #fff; }
+    .clear-menu button { user-select: none; -webkit-user-select: none; }
     .clear-menu .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 5px 6px; }
     .clear-menu button.clear-all { color: #f87171; font-weight: 600; }
-    .clear-menu button.clear-all:hover { background: rgba(239,68,68,0.18); color: #fca5a5; }
+    .clear-menu button.clear-all:hover, .clear-menu button.clear-all.hot { background: rgba(239,68,68,0.18); color: #fca5a5; }
     .result { margin-top: 16px; padding: 16px; border-radius: 14px; text-align: center; opacity: 0; transform: translateY(12px) scale(0.97); transition: opacity 0.4s ease, transform 0.4s ease; display: none; }
     .result.show { display: block; opacity: 1; transform: translateY(0) scale(1); }
     .result.profit { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(52,211,153,0.08)); border: 1px solid rgba(16,185,129,0.25); }
@@ -121,21 +122,51 @@
     $('calcBtn').addEventListener('click',calculate);
     document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
 
-    // Clear Fields dropdown
+    // Clear Fields — supports BOTH tap-to-open-then-click AND press-and-hold-drag-release.
     const clearBtn=$('clearBtn'),clearMenu=$('clearMenu');
-    const closeMenu=()=>{clearMenu.classList.remove('open');clearBtn.setAttribute('aria-expanded','false');};
+    const clearOpts=[...clearMenu.querySelectorAll('button[data-clear]')];
+    const closeMenu=()=>{clearMenu.classList.remove('open');clearBtn.setAttribute('aria-expanded','false');clearHot();};
     const openMenu=()=>{clearMenu.classList.add('open');clearBtn.setAttribute('aria-expanded','true');};
-    clearBtn.addEventListener('click',e=>{e.stopPropagation();clearMenu.classList.contains('open')?closeMenu():openMenu();});
-    clearMenu.querySelectorAll('button[data-clear]').forEach(b=>{
-      b.addEventListener('click',()=>{
-        b.dataset.clear.split(',').forEach(id=>{$(id).value='';});
-        // clearing inputs invalidates any shown result/error
-        $('result').classList.remove('show','profit','loss','neutral');
-        $('errorMsg').classList.remove('show');
-        closeMenu();
-      });
+    const clearHot=()=>clearOpts.forEach(b=>b.classList.remove('hot'));
+    const runClear=b=>{
+      if(!b)return;
+      b.dataset.clear.split(',').forEach(id=>{$(id).value='';});
+      $('result').classList.remove('show','profit','loss','neutral');
+      $('errorMsg').classList.remove('show');
+      closeMenu();
+    };
+    // option under a screen point (for hold-drag), or null
+    const optAtPoint=(x,y)=>{const el=document.elementFromPoint(x,y);return el?el.closest('button[data-clear]'):null;};
+
+    // plain click on an option (tap-open flow)
+    clearOpts.forEach(b=>b.addEventListener('click',()=>runClear(b)));
+
+    let holdDragged=false, pressing=false;
+    clearBtn.addEventListener('pointerdown',e=>{
+      e.preventDefault();           // stop text-selection / native callout
+      pressing=true; holdDragged=false;
+      openMenu();
+      clearBtn.setPointerCapture?.(e.pointerId);  // keep getting moves even off the button
     });
-    document.addEventListener('click',e=>{if(!clearMenu.contains(e.target)&&e.target!==clearBtn)closeMenu();});
+    clearBtn.addEventListener('pointermove',e=>{
+      if(!pressing)return;
+      const o=optAtPoint(e.clientX,e.clientY);
+      if(o)holdDragged=true;        // finger has moved onto an option → it's a hold-drag
+      clearHot();
+      if(o)o.classList.add('hot');
+    });
+    clearBtn.addEventListener('pointerup',e=>{
+      if(!pressing)return;
+      pressing=false;
+      clearBtn.releasePointerCapture?.(e.pointerId);
+      const o=optAtPoint(e.clientX,e.clientY);
+      if(o){ runClear(o); return; }              // released over an option → do it
+      if(holdDragged){ closeMenu(); return; }    // dragged away then released on nothing → cancel
+      // otherwise: a plain tap on the button → leave menu open for click selection
+    });
+    clearBtn.addEventListener('pointercancel',()=>{pressing=false;clearHot();});
+
+    document.addEventListener('click',e=>{if(!clearMenu.contains(e.target)&&e.target!==clearBtn&&!clearBtn.contains(e.target))closeMenu();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
     function calculate(){
       const errEl=$('errorMsg'),resEl=$('result');
