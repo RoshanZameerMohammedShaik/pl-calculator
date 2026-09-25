@@ -15,6 +15,8 @@
     body {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+      gap: 14px;
       align-items: center;
       justify-content: center;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -22,7 +24,8 @@
       color: #e0e0e0;
       overflow-y: auto;
       padding: 20px 0;
-      padding-top: env(safe-area-inset-top);
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
     .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     .bg-particles span { position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: float linear infinite; }
@@ -38,8 +41,8 @@
     .field .input-wrap { position: relative; display: flex; align-items: center; }
     .field .prefix { position: absolute; left: 12px; font-size: 14px; color: #6b7280; pointer-events: none; transition: color 0.2s; }
     .field input { width: 100%; padding: 10px 12px 10px 28px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f3f4f6; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    .field input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.15); }
-    .field input:focus ~ .prefix, .field input:not(:placeholder-shown) ~ .prefix { color: #a78bfa; }
+    .field input:focus, .field input.kp-target { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.15); }
+    .field input:focus ~ .prefix, .field input:not(:placeholder-shown) ~ .prefix, .field input.kp-target ~ .prefix { color: #a78bfa; }
     .field input::placeholder { color: #4b5563; }
     .btn { width: 100%; padding: 12px; margin-top: 4px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, #7c3aed, #3b82f6); color: #fff; letter-spacing: 0.5px; transition: transform 0.15s, box-shadow 0.2s; position: relative; overflow: hidden; }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.4); }
@@ -60,6 +63,21 @@
     .clear-menu .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 5px 6px; }
     .clear-menu button.clear-all { color: #f87171; font-weight: 600; }
     .clear-menu button.clear-all:hover, .clear-menu button.clear-all.hot { background: rgba(239,68,68,0.18); color: #fca5a5; }
+    .btn-kp { width: 100%; margin-top: 4px; padding: 11px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.06); color: #cbd5e1; letter-spacing: 0.4px; transition: background 0.2s, border-color 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    .btn-kp:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); }
+    .btn-kp:active { transform: scale(0.98); }
+    .btn-kp svg { width: 15px; height: 15px; opacity: 0.85; }
+    .keypad { z-index: 0; padding: 14px; }  /* below the main card so the Clear Fields menu can overlap it */
+    .keypad:hover { transform: none; }
+    .keypad[hidden] { display: none; }
+    .keypad.kp-in { animation: kpIn 0.22s ease; }
+    @keyframes kpIn { from { opacity: 0; transform: translateY(-8px); } }
+    .kp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .kp-key { height: 52px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.06); color: #f3f4f6; font-family: inherit; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 0.12s, border-color 0.12s, transform 0.08s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+    .kp-key.kp-fn { color: #c4b5fd; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.18); }
+    .kp-key svg { width: 24px; height: 24px; }
+    @media (hover: hover) { .kp-key:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.35); } }
+    .kp-key.pressed { background: rgba(167,139,250,0.28); border-color: rgba(167,139,250,0.55); transform: scale(0.96); }
     .result { margin-top: 16px; padding: 16px; border-radius: 14px; text-align: center; opacity: 0; transform: translateY(12px) scale(0.97); transition: opacity 0.4s ease, transform 0.4s ease; display: none; }
     .result.show { display: block; opacity: 1; transform: translateY(0) scale(1); }
     .result.profit { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(52,211,153,0.08)); border: 1px solid rgba(16,185,129,0.25); }
@@ -88,9 +106,9 @@
       <h1>Stock P&amp;L Calculator</h1>
       <p>Calculate your profit or loss instantly</p>
     </div>
-    <div class="field"><label>Investment Amount</label><div class="input-wrap"><input type="number" id="investment" placeholder="0.00" step="any" min="0"><span class="prefix">$</span></div></div>
-    <div class="field"><label>Purchase Price per Share</label><div class="input-wrap"><input type="number" id="buyPrice" placeholder="0.00" step="any" min="0"><span class="prefix">$</span></div></div>
-    <div class="field"><label>Current Price per Share</label><div class="input-wrap"><input type="number" id="currentPrice" placeholder="0.00" step="any" min="0"><span class="prefix">$</span></div></div>
+    <div class="field"><label>Investment Amount</label><div class="input-wrap"><input type="text" inputmode="decimal" autocomplete="off" id="investment" placeholder="0.00"><span class="prefix">$</span></div></div>
+    <div class="field"><label>Purchase Price per Share</label><div class="input-wrap"><input type="text" inputmode="decimal" autocomplete="off" id="buyPrice" placeholder="0.00"><span class="prefix">$</span></div></div>
+    <div class="field"><label>Current Price per Share</label><div class="input-wrap"><input type="text" inputmode="decimal" autocomplete="off" id="currentPrice" placeholder="0.00"><span class="prefix">$</span></div></div>
     <div class="clear-wrap">
       <button class="btn-clear" id="clearBtn" aria-haspopup="true" aria-expanded="false">Clear Fields <span class="chevron">▼</span></button>
       <div class="clear-menu" id="clearMenu" role="menu">
@@ -102,6 +120,7 @@
         <button type="button" class="clear-all" data-clear="investment,buyPrice,currentPrice" role="menuitem">Clear All</button>
       </div>
     </div>
+    <button type="button" class="btn-kp" id="kpToggle" aria-controls="keypad" aria-expanded="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="3" r="2"/><circle cx="12" cy="3" r="2"/><circle cx="19" cy="3" r="2"/><circle cx="5" cy="9" r="2"/><circle cx="12" cy="9" r="2"/><circle cx="19" cy="9" r="2"/><circle cx="5" cy="15" r="2"/><circle cx="12" cy="15" r="2"/><circle cx="19" cy="15" r="2"/><circle cx="12" cy="21" r="2"/></svg><span id="kpToggleLabel">Hide Keypad</span></button>
     <button class="btn" id="calcBtn">Calculate P&amp;L</button>
     <div class="error-msg" id="errorMsg"></div>
     <div class="result" id="result">
@@ -115,12 +134,85 @@
       </div>
     </div>
   </div>
+  <div class="card keypad" id="keypad" role="group" aria-label="Number keypad">
+    <div class="kp-grid">
+      <button type="button" class="kp-key" data-key="1" tabindex="-1">1</button>
+      <button type="button" class="kp-key" data-key="2" tabindex="-1">2</button>
+      <button type="button" class="kp-key" data-key="3" tabindex="-1">3</button>
+      <button type="button" class="kp-key" data-key="4" tabindex="-1">4</button>
+      <button type="button" class="kp-key" data-key="5" tabindex="-1">5</button>
+      <button type="button" class="kp-key" data-key="6" tabindex="-1">6</button>
+      <button type="button" class="kp-key" data-key="7" tabindex="-1">7</button>
+      <button type="button" class="kp-key" data-key="8" tabindex="-1">8</button>
+      <button type="button" class="kp-key" data-key="9" tabindex="-1">9</button>
+      <button type="button" class="kp-key kp-fn" data-key="." tabindex="-1" aria-label="Decimal point">.</button>
+      <button type="button" class="kp-key" data-key="0" tabindex="-1">0</button>
+      <button type="button" class="kp-key kp-fn" data-key="back" tabindex="-1" aria-label="Backspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button>
+    </div>
+  </div>
   <script>
     (()=>{const c=document.getElementById('particles');for(let i=0;i<30;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.animationDuration=(6+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';s.style.width=s.style.height=(2+Math.random()*4)+'px';c.appendChild(s);}})();
     const $=id=>document.getElementById(id);
     const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     $('calcBtn').addEventListener('click',calculate);
     document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+
+    // Investment amount is saved on this device and put back on every visit, until cleared from the Clear Fields menu.
+    const INV_KEY='plCalc.investment',KP_KEY='plCalc.keypadHidden';
+    const store={
+      get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},
+      set:(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);}catch(e){}}  // empty value = forget it
+    };
+    const fields=['investment','buyPrice','currentPrice'].map($);
+    const VALID=/^\d*\.?\d*$/;  // digits with at most one '.'
+    const clean=v=>{v=v.replace(/[^\d.]/g,'');const i=v.indexOf('.');return i<0?v:v.slice(0,i+1)+v.slice(i+1).replace(/\./g,'');};
+    fields.forEach(f=>{
+      // ignore typed keys that would break the number (letters, a second '.')
+      f.addEventListener('beforeinput',e=>{
+        if(e.inputType==='insertText'&&e.data&&!VALID.test(f.value.slice(0,f.selectionStart)+e.data+f.value.slice(f.selectionEnd)))e.preventDefault();
+      });
+      f.addEventListener('input',()=>{
+        const c=clean(f.value);  // pasted "$1,234.50" becomes "1234.50"
+        if(c!==f.value)f.value=c;
+        if(f===fields[0])store.set(INV_KEY,f.value);
+      });
+      f.addEventListener('focus',()=>setTarget(f));
+    });
+    fields[0].value=clean(store.get(INV_KEY)||'');
+
+    // Keypad types into the highlighted field: the last one tapped, starting on the first empty one.
+    const keypad=$('keypad'),kpToggle=$('kpToggle');
+    let target=fields.find(f=>!f.value)||fields[0];
+    const setTarget=f=>{target=f;fields.forEach(x=>x.classList.toggle('kp-target',!keypad.hidden&&x===f));};
+    const setKeypad=(show,animate)=>{
+      keypad.hidden=!show;
+      kpToggle.setAttribute('aria-expanded',show);
+      $('kpToggleLabel').textContent=show?'Hide Keypad':'Unhide Keypad';
+      fields.forEach(f=>f.setAttribute('inputmode',show?'none':'decimal'));  // keypad showing = no phone keyboard popping up over it
+      store.set(KP_KEY,show?'':'1');
+      setTarget(target);
+      if(show&&animate){keypad.classList.remove('kp-in');void keypad.offsetWidth;keypad.classList.add('kp-in');}
+    };
+    kpToggle.addEventListener('click',()=>{
+      if(fields.includes(document.activeElement))document.activeElement.blur();  // next tap on a field opens it in the new mode
+      setKeypad(keypad.hidden,true);
+    });
+    const press=k=>{
+      const f=target,v=f.value,focused=document.activeElement===f;
+      let s=focused?f.selectionStart:v.length,end=focused?f.selectionEnd:v.length,next;
+      if(k==='back'){if(s===end){if(!s)return;s--;}next=v.slice(0,s)+v.slice(end);}
+      else{next=v.slice(0,s)+k+v.slice(end);if(!VALID.test(next))return;s++;}
+      f.value=next;
+      if(focused)f.setSelectionRange(s,s);
+      f.dispatchEvent(new Event('input',{bubbles:true}));
+    };
+    keypad.querySelectorAll('.kp-key').forEach(b=>{
+      // mouse: keep focus + caret in the field. Not on touch: iPhone Safari then drops the tap's click.
+      b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')e.preventDefault();b.classList.add('pressed');});
+      ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,()=>b.classList.remove('pressed')));
+      b.addEventListener('click',()=>press(b.dataset.key));
+    });
+    setKeypad(store.get(KP_KEY)!=='1',false);
 
     // Clear Fields — supports BOTH tap-to-open-then-click AND press-and-hold-drag-release.
     const clearBtn=$('clearBtn'),clearMenu=$('clearMenu');
@@ -130,7 +222,10 @@
     const clearHot=()=>clearOpts.forEach(b=>b.classList.remove('hot'));
     const runClear=b=>{
       if(!b)return;
-      b.dataset.clear.split(',').forEach(id=>{$(id).value='';});
+      const ids=b.dataset.clear.split(',');
+      ids.forEach(id=>{$(id).value='';});
+      store.set(INV_KEY,fields[0].value);  // Clear Investment / Clear All also forget the saved amount
+      setTarget($(ids[0]));                // keypad moves to the field just cleared
       $('result').classList.remove('show','profit','loss','neutral');
       $('errorMsg').classList.remove('show');
       closeMenu();
