@@ -47,7 +47,7 @@
     .btn { width: 100%; padding: 12px; margin-top: 4px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, #7c3aed, #3b82f6); color: #fff; letter-spacing: 0.5px; transition: transform 0.15s, box-shadow 0.2s; position: relative; overflow: hidden; }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.4); }
     .btn:active { transform: scale(0.98); }
-    .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); transform: translateX(-100%); transition: transform 0.5s; }
+    .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); transform: translateX(-100%); transition: transform 0.5s; pointer-events: none; }
     .btn:hover::after { transform: translateX(100%); }
     .clear-wrap { position: relative; margin-top: 4px; }
     .btn-clear { width: 100%; padding: 11px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.06); color: #cbd5e1; letter-spacing: 0.4px; transition: background 0.2s, border-color 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
@@ -78,6 +78,9 @@
     .kp-key svg { width: 24px; height: 24px; }
     @media (hover: hover) { .kp-key:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.35); } }
     .kp-key.pressed { background: rgba(167,139,250,0.28); border-color: rgba(167,139,250,0.55); transform: scale(0.96); }
+    .haptic { position: absolute; inset: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    .haptic input { position: absolute; width: 1px; height: 1px; margin: 0; visibility: hidden; }
+    button:has(> .haptic) { position: relative; }
     .result { margin-top: 16px; padding: 16px; border-radius: 14px; text-align: center; opacity: 0; transform: translateY(12px) scale(0.97); transition: opacity 0.4s ease, transform 0.4s ease; display: none; }
     .result.show { display: block; opacity: 1; transform: translateY(0) scale(1); }
     .result.profit { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(52,211,153,0.08)); border: 1px solid rgba(16,185,129,0.25); }
@@ -156,6 +159,21 @@
     const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     $('calcBtn').addEventListener('click',calculate);
     document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+
+    // Haptic tick when a button is tapped on a phone. Android: navigator.vibrate. iPhone has no vibrate API, but Safari
+    // plays the system haptic when a real tap toggles a switch checkbox, so every button gets a see-through label on top
+    // wrapping a hidden switch (same technique as the MIT-licensed ios-haptics library).
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    const canVibrate=!isIOS&&'vibrate' in navigator&&matchMedia('(pointer: coarse)').matches;
+    const haptic=()=>{if(canVibrate)navigator.vibrate(15);};
+    if(isIOS)document.querySelectorAll('button').forEach(b=>{
+      const l=document.createElement('label'),sw=document.createElement('input');
+      l.className='haptic';l.setAttribute('aria-hidden','true');
+      sw.type='checkbox';sw.setAttribute('switch','');sw.tabIndex=-1;
+      sw.addEventListener('click',e=>e.stopPropagation());  // the label's own click already reached the button
+      l.append(sw);b.append(l);
+    });
+    document.addEventListener('click',e=>{if(e.target.closest?.('button'))haptic();});
 
     // Investment amount is saved on this device and put back on every visit, until cleared from the Clear Fields menu.
     const INV_KEY='plCalc.investment',KP_KEY='plCalc.keypadHidden';
@@ -238,7 +256,7 @@
 
     let holdDragged=false, pressing=false;
     clearBtn.addEventListener('pointerdown',e=>{
-      e.preventDefault();           // stop text-selection / native callout
+      if(e.pointerType==='mouse')e.preventDefault();  // mouse: no text selection. Touch: CSS covers that, and a canceled touch loses its click (and the iPhone haptic)
       pressing=true; holdDragged=false;
       openMenu();
       clearBtn.setPointerCapture?.(e.pointerId);  // keep getting moves even off the button
@@ -255,7 +273,7 @@
       pressing=false;
       clearBtn.releasePointerCapture?.(e.pointerId);
       const o=optAtPoint(e.clientX,e.clientY);
-      if(o){ runClear(o); return; }              // released over an option → do it
+      if(o){ haptic(); runClear(o); return; }    // released over an option → do it
       if(holdDragged){ closeMenu(); return; }    // dragged away then released on nothing → cancel
       // otherwise: a plain tap on the button → leave menu open for click selection
     });
