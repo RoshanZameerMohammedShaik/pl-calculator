@@ -78,6 +78,12 @@
     .kp-key svg { width: 24px; height: 24px; }
     @media (hover: hover) { .kp-key:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.35); } }
     .kp-key.pressed { background: rgba(167,139,250,0.28); border-color: rgba(167,139,250,0.55); transform: scale(0.96); }
+    .title-row { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; }
+    .title-row h1 { grid-column: 2; }
+    .cur-toggle { grid-column: 3; justify-self: end; display: flex; gap: 2px; padding: 2px; border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; background: rgba(255,255,255,0.06); cursor: pointer; font-family: inherit; transition: border-color 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    .cur-toggle:hover { border-color: rgba(167,139,250,0.4); }
+    .cur-toggle span { width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 13px; font-weight: 700; color: #9ca3af; transition: background 0.2s, color 0.2s; }
+    .cur-toggle span.on { background: linear-gradient(135deg, #7c3aed, #3b82f6); color: #fff; }
     .haptic { position: absolute; inset: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .haptic input { position: absolute; width: 1px; height: 1px; margin: 0; visibility: hidden; }
     button:has(> .haptic) { position: relative; }
@@ -106,7 +112,7 @@
   <div class="card">
     <div class="logo">
       <svg viewBox="0 0 48 48" fill="none"><rect x="4" y="28" width="8" height="16" rx="2" fill="#7c3aed" opacity="0.7"/><rect x="16" y="18" width="8" height="26" rx="2" fill="#3b82f6" opacity="0.8"/><rect x="28" y="8" width="8" height="36" rx="2" fill="#60a5fa" opacity="0.9"/><path d="M8 26L20 16L32 6L44 2" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="44" cy="2" r="3" fill="#a78bfa"/></svg>
-      <h1>Stock P&amp;L Calculator</h1>
+      <div class="title-row"><h1>Stock P&amp;L Calculator</h1><button type="button" class="cur-toggle" id="curToggle"><span data-cur="USD">$</span><span data-cur="INR">₹</span></button></div>
       <p>Calculate your profit or loss instantly</p>
     </div>
     <div class="field"><label>Investment Amount</label><div class="input-wrap"><input type="text" inputmode="decimal" autocomplete="off" id="investment" placeholder="0.00"><span class="prefix">$</span></div></div>
@@ -156,7 +162,6 @@
   <script>
     (()=>{const c=document.getElementById('particles');for(let i=0;i<30;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.animationDuration=(6+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';s.style.width=s.style.height=(2+Math.random()*4)+'px';c.appendChild(s);}})();
     const $=id=>document.getElementById(id);
-    const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     $('calcBtn').addEventListener('click',calculate);
     document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
 
@@ -182,18 +187,48 @@
       set:(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);}catch(e){}}  // empty value = forget it
     };
     const fields=['investment','buyPrice','currentPrice'].map($);
-    const VALID=/^\d*\.?\d*$/;  // digits with at most one '.'
+
+    // Currency: only the symbol and the digit grouping change (the locale decides: $ 1,234,567 / ₹ 12,34,567).
+    const CUR_KEY='plCalc.currency';
+    const CURRENCIES={USD:{sym:'$',locale:'en-US'},INR:{sym:'₹',locale:'en-IN'}};
+    let cur=CURRENCIES[store.get(CUR_KEY)]?store.get(CUR_KEY):'USD';
+    const loc=()=>CURRENCIES[cur].locale;
+    const fmt=n=>n.toLocaleString(loc(),{minimumFractionDigits:2,maximumFractionDigits:2});
+    const groupSep=()=>new Intl.NumberFormat(loc()).formatToParts(1e6).find(p=>p.type==='group').value;
+
+    // Fields show grouping commas while typing. Saved values and the math use the plain digits (clean()).
+    const VALID=/^\d*\.?\d*$/;  // plain digits with at most one '.'
     const clean=v=>{v=v.replace(/[^\d.]/g,'');const i=v.indexOf('.');return i<0?v:v.slice(0,i+1)+v.slice(i+1).replace(/\./g,'');};
+    const group=raw=>{const i=raw.indexOf('.'),int=i<0?raw:raw.slice(0,i);return (int&&BigInt(int).toLocaleString(loc()))+(i<0?'':raw.slice(i));};
+    const num=f=>parseFloat(clean(f.value));
+    // Regroup a field, keeping the caret after the same digit it was after.
+    const reformat=f=>{
+      const v=f.value,focused=document.activeElement===f;
+      const n=clean(v.slice(0,focused?f.selectionStart:v.length)).length;
+      const out=group(clean(v));  // pasted "$1,234.50" becomes "1,234.50"
+      if(out!==v)f.value=out;
+      if(focused){let p=0;for(let k=0;p<out.length&&k<n;p++)if(/[\d.]/.test(out[p]))k++;f.setSelectionRange(p,p);}
+      if(f===fields[0])store.set(INV_KEY,clean(out));
+    };
+    // Replace [s,end) of a field's text, then regroup. Refuses anything that isn't a number.
+    const splice=(f,s,end,ins)=>{
+      const next=f.value.slice(0,s)+ins+f.value.slice(end);
+      if(!VALID.test(next.split(groupSep()).join('')))return;
+      f.value=next;
+      if(document.activeElement===f)f.setSelectionRange(s+ins.length,s+ins.length);
+      reformat(f);
+    };
     fields.forEach(f=>{
-      // ignore typed keys that would break the number (letters, a second '.')
       f.addEventListener('beforeinput',e=>{
-        if(e.inputType==='insertText'&&e.data&&!VALID.test(f.value.slice(0,f.selectionStart)+e.data+f.value.slice(f.selectionEnd)))e.preventDefault();
+        const v=f.value,s=f.selectionStart,end=f.selectionEnd,sep=groupSep();
+        // ignore typed keys that would break the number (letters, a second '.')
+        if(e.inputType==='insertText'&&e.data){if(!VALID.test((v.slice(0,s)+e.data+v.slice(end)).split(sep).join('')))e.preventDefault();return;}
+        // deleting only a comma would be undone by the regroup, so take the digit beside it too
+        if(s!==end)return;
+        if(e.inputType==='deleteContentBackward'&&v[s-1]===sep){e.preventDefault();splice(f,s-2,s,'');}
+        if(e.inputType==='deleteContentForward'&&v[s]===sep){e.preventDefault();splice(f,s,s+2,'');}
       });
-      f.addEventListener('input',()=>{
-        const c=clean(f.value);  // pasted "$1,234.50" becomes "1234.50"
-        if(c!==f.value)f.value=c;
-        if(f===fields[0])store.set(INV_KEY,f.value);
-      });
+      f.addEventListener('input',()=>reformat(f));
       f.addEventListener('focus',()=>setTarget(f));
     });
     fields[0].value=clean(store.get(INV_KEY)||'');
@@ -217,12 +252,10 @@
     });
     const press=k=>{
       const f=target,v=f.value,focused=document.activeElement===f;
-      let s=focused?f.selectionStart:v.length,end=focused?f.selectionEnd:v.length,next;
-      if(k==='back'){if(s===end){if(!s)return;s--;}next=v.slice(0,s)+v.slice(end);}
-      else{next=v.slice(0,s)+k+v.slice(end);if(!VALID.test(next))return;s++;}
-      f.value=next;
-      if(focused)f.setSelectionRange(s,s);
-      f.dispatchEvent(new Event('input',{bubbles:true}));
+      let s=focused?f.selectionStart:v.length,end=focused?f.selectionEnd:v.length;
+      if(k!=='back')return splice(f,s,end,k);
+      if(s===end){if(!s)return;s--;if(v[s]===groupSep()&&s)s--;}  // backspace hops over a comma
+      splice(f,s,end,'');
     };
     keypad.querySelectorAll('.kp-key').forEach(b=>{
       // mouse: keep focus + caret in the field. Not on touch: iPhone Safari then drops the tap's click.
@@ -231,6 +264,20 @@
       b.addEventListener('click',()=>press(b.dataset.key));
     });
     setKeypad(store.get(KP_KEY)!=='1',false);
+
+    // Currency toggle (top right of the title): steps to the next currency and regroups everything shown.
+    const curBtn=$('curToggle');
+    let last=null;  // last result, redrawn when the currency changes
+    const setCurrency=c=>{
+      cur=c;store.set(CUR_KEY,c==='USD'?'':c);
+      document.querySelectorAll('.prefix').forEach(p=>p.textContent=CURRENCIES[c].sym);
+      curBtn.querySelectorAll('[data-cur]').forEach(s=>s.classList.toggle('on',s.dataset.cur===c));
+      curBtn.setAttribute('aria-label','Currency '+CURRENCIES[c].sym+', tap to switch');
+      fields.forEach(f=>reformat(f));
+      renderResult();
+    };
+    curBtn.addEventListener('click',()=>{const codes=Object.keys(CURRENCIES);setCurrency(codes[(codes.indexOf(cur)+1)%codes.length]);});
+    setCurrency(cur);
 
     // Clear Fields — supports BOTH tap-to-open-then-click AND press-and-hold-drag-release.
     const clearBtn=$('clearBtn'),clearMenu=$('clearMenu');
@@ -242,7 +289,7 @@
       if(!b)return;
       const ids=b.dataset.clear.split(',');
       ids.forEach(id=>{$(id).value='';});
-      store.set(INV_KEY,fields[0].value);  // Clear Investment / Clear All also forget the saved amount
+      store.set(INV_KEY,clean(fields[0].value));  // Clear Investment / Clear All also forget the saved amount
       setTarget($(ids[0]));                // keypad moves to the field just cleared
       $('result').classList.remove('show','profit','loss','neutral');
       $('errorMsg').classList.remove('show');
@@ -281,20 +328,25 @@
 
     document.addEventListener('click',e=>{if(!clearMenu.contains(e.target)&&e.target!==clearBtn&&!clearBtn.contains(e.target))closeMenu();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+    function renderResult(){
+      if(!last)return;
+      const {pl,plPct,shares,currentValue}=last,sym=CURRENCIES[cur].sym;
+      $('resAmount').textContent=(pl>=0?'+':'-')+sym+fmt(Math.abs(pl));
+      $('resPct').textContent=(plPct>=0?'+':'')+fmt(plPct)+'%';
+      $('resShares').textContent=fmt(shares);
+      $('resValue').textContent=sym+fmt(currentValue);
+    }
     function calculate(){
       const errEl=$('errorMsg'),resEl=$('result');
       errEl.classList.remove('show');resEl.classList.remove('show','profit','loss','neutral');
-      const investment=parseFloat($('investment').value),buyPrice=parseFloat($('buyPrice').value),currentPrice=parseFloat($('currentPrice').value);
+      const [investment,buyPrice,currentPrice]=fields.map(num);
       if([investment,buyPrice,currentPrice].some(v=>isNaN(v)||v<0)){errEl.textContent='Please enter valid positive numbers for all fields.';errEl.classList.add('show');return;}
       if(buyPrice===0){errEl.textContent='Purchase price cannot be zero.';errEl.classList.add('show');return;}
-      const shares=investment/buyPrice,currentValue=shares*currentPrice,plDollar=currentValue-investment,plPct=((currentPrice-buyPrice)/buyPrice)*100;
-      const isProfit=plDollar>0,isLoss=plDollar<0,type=isProfit?'profit':isLoss?'loss':'neutral';
+      const shares=investment/buyPrice,currentValue=shares*currentPrice,pl=currentValue-investment,plPct=((currentPrice-buyPrice)/buyPrice)*100;
+      const isProfit=pl>0,isLoss=pl<0,type=isProfit?'profit':isLoss?'loss':'neutral';
       $('resIcon').textContent=isProfit?'\u{1F4C8}':isLoss?'\u{1F4C9}':'\u2796';
       $('resLabel').textContent=isProfit?'Total Profit':isLoss?'Total Loss':'Break Even';
-      $('resAmount').textContent=(plDollar>=0?'+$':'-$')+fmt(Math.abs(plDollar));
-      $('resPct').textContent=(plPct>=0?'+':'')+fmt(plPct)+'%';
-      $('resShares').textContent=fmt(shares);
-      $('resValue').textContent='$'+fmt(currentValue);
+      last={pl,plPct,shares,currentValue};renderResult();
       resEl.classList.add(type);requestAnimationFrame(()=>resEl.classList.add('show'));
     }
   </script>
