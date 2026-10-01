@@ -11,6 +11,9 @@
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23302b63' width='100' height='100' rx='20'/><text y='70' x='15' font-size='60'>📈</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); --ease-std: cubic-bezier(0.4, 0, 0.2, 1); }
+    button, input { font-family: inherit; }
+    ::selection { background: rgba(167,139,250,0.35); }
     html { background: #0f0c29; }
     body {
       min-height: 100vh;
@@ -22,6 +25,7 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       color: #e0e0e0;
+      -webkit-font-smoothing: antialiased;
       overflow-y: auto;
       padding: 20px 0;
       padding-top: max(20px, env(safe-area-inset-top));
@@ -29,9 +33,17 @@
     }
     .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     .bg-particles span { position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: float linear infinite; }
+    /* soft colored light behind the glass: tints green or red with the result, then holds still */
+    .aurora, .aurora::before, .aurora::after { position: fixed; inset: 0; pointer-events: none; }
+    .aurora { z-index: 0; background: radial-gradient(55% 40% at 15% 8%, rgba(124,58,237,0.22), transparent 70%), radial-gradient(50% 40% at 90% 92%, rgba(59,130,246,0.16), transparent 70%); }
+    .aurora::before, .aurora::after { content: ''; opacity: 0; transition: opacity 1.2s var(--ease-std); }
+    .aurora::before { background: radial-gradient(60% 45% at 50% 50%, rgba(16,185,129,0.24), transparent 70%); }
+    .aurora::after { background: radial-gradient(60% 45% at 50% 50%, rgba(239,68,68,0.22), transparent 70%); }
+    body.mood-profit .aurora::before, body.mood-loss .aurora::after { opacity: 1; }
     @keyframes float { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
-    .card { position: relative; z-index: 1; background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 28px 24px; width: 380px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transition: transform 0.3s ease; }
-    .card:hover { transform: translateY(-2px); }
+    .card { position: relative; z-index: 1; background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 28px 24px; width: 380px; max-width: calc(100vw - 20px); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07); transition: transform 0.3s ease; }
+    /* lit edge: a hairline gradient border on the main card */
+    .card:not(.keypad)::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgba(167,139,250,0.55), rgba(96,165,250,0.08) 35%, transparent 60%, rgba(96,165,250,0.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
     .logo { text-align: center; margin-bottom: 18px; }
     .logo svg { width: 36px; height: 36px; margin-bottom: 4px; }
     .logo h1 { font-size: 18px; font-weight: 700; background: linear-gradient(90deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -40,63 +52,63 @@
     .field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #9ca3af; margin-bottom: 4px; }
     .field .input-wrap { position: relative; display: flex; align-items: center; }
     .field .prefix { position: absolute; left: 12px; font-size: 14px; color: #6b7280; pointer-events: none; transition: color 0.2s; }
-    .field input { width: 100%; padding: 10px 12px 10px 28px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f3f4f6; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .field input { width: 100%; padding: 10px 12px 10px 28px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f3f4f6; font-size: 14px; font-variant-numeric: tabular-nums; caret-color: #a78bfa; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .field input:focus, .field input.kp-target { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.15); }
     .field input:focus ~ .prefix, .field input:not(:placeholder-shown) ~ .prefix, .field input.kp-target ~ .prefix { color: #a78bfa; }
     .field input::placeholder { color: #4b5563; }
     .btn { width: 100%; padding: 12px; margin-top: 4px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, #7c3aed, #3b82f6); color: #fff; letter-spacing: 0.5px; transition: transform 0.15s, box-shadow 0.2s; position: relative; overflow: hidden; }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.4); }
     .btn:active { transform: scale(0.98); }
     .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); transform: translateX(-100%); transition: transform 0.5s; pointer-events: none; }
-    .btn:hover::after { transform: translateX(100%); }
     .clear-wrap { position: relative; margin-top: 4px; }
     .btn-clear { width: 100%; padding: 11px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.06); color: #cbd5e1; letter-spacing: 0.4px; transition: background 0.2s, border-color 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-    .btn-clear:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); }
     .btn-clear:active { transform: scale(0.98); }
     .btn-clear .chevron { font-size: 10px; transition: transform 0.2s; }
     .btn-clear[aria-expanded="true"] .chevron { transform: rotate(180deg); }
     .clear-menu { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: rgba(30,27,55,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 5; opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; }
     .clear-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .clear-menu button { width: 100%; text-align: left; padding: 9px 12px; background: transparent; border: none; border-radius: 8px; color: #e0e0e0; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; }
-    .clear-menu button:hover, .clear-menu button.hot { background: rgba(167,139,250,0.18); color: #fff; }
+    .clear-menu button.hot { background: rgba(167,139,250,0.18); color: #fff; }
     .clear-menu button { user-select: none; -webkit-user-select: none; }
     .clear-menu .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 5px 6px; }
     .clear-menu button.clear-all { color: #f87171; font-weight: 600; }
-    .clear-menu button.clear-all:hover, .clear-menu button.clear-all.hot { background: rgba(239,68,68,0.18); color: #fca5a5; }
+    .clear-menu button.clear-all.hot { background: rgba(239,68,68,0.18); color: #fca5a5; }
     .btn-kp { width: 100%; margin-top: 4px; padding: 11px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.06); color: #cbd5e1; letter-spacing: 0.4px; transition: background 0.2s, border-color 0.2s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
-    .btn-kp:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); }
     .btn-kp:active { transform: scale(0.98); }
     .btn-kp svg { width: 15px; height: 15px; opacity: 0.85; }
     .keypad { z-index: 0; padding: 14px; }  /* below the main card so the Clear Fields menu can overlap it */
-    .keypad:hover { transform: none; }
     .keypad[hidden] { display: none; }
-    .keypad.kp-in { animation: kpIn 0.22s ease; }
-    @keyframes kpIn { from { opacity: 0; transform: translateY(-8px); } }
     .kp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .kp-key { height: 52px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.06); color: #f3f4f6; font-family: inherit; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 0.12s, border-color 0.12s, transform 0.08s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+    .kp-key { height: 52px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.06); color: #f3f4f6; font-family: inherit; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 0.12s, border-color 0.12s, transform 0.08s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.25); }
+    .ripple { position: absolute; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(196,181,253,0.45) 0%, rgba(196,181,253,0) 65%); transform: scale(0); animation: ripple 0.55s var(--ease-out) forwards; }
+    @keyframes ripple { to { transform: scale(1); opacity: 0; } }
     .kp-key.kp-fn { color: #c4b5fd; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.18); }
     .kp-key svg { width: 24px; height: 24px; }
     @media (hover: hover) { .kp-key:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.35); } }
     .kp-key.pressed { background: rgba(167,139,250,0.28); border-color: rgba(167,139,250,0.55); transform: scale(0.96); }
-    .title-row { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; }
-    .title-row h1 { grid-column: 2; }
-    .cur-toggle { grid-column: 3; justify-self: end; display: flex; gap: 2px; padding: 2px; border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; background: rgba(255,255,255,0.06); cursor: pointer; font-family: inherit; transition: border-color 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
-    .cur-toggle:hover { border-color: rgba(167,139,250,0.4); }
-    .cur-toggle span { width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 13px; font-weight: 700; color: #9ca3af; transition: background 0.2s, color 0.2s; }
-    .cur-toggle span.on { background: linear-gradient(135deg, #7c3aed, #3b82f6); color: #fff; }
+    .title-row { display: grid; grid-template-columns: minmax(0,1fr) auto 1fr; align-items: center; gap: 6px; }
+    .title-row h1 { grid-column: 2; white-space: nowrap; }
+    .cur-toggle { grid-column: 3; justify-self: end; display: flex; gap: 2px; padding: 2px; border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; background: rgba(255,255,255,0.06); cursor: pointer; position: relative; transition: border-color 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    .cur-toggle::before { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 22px; border-radius: 999px; background: linear-gradient(135deg, #7c3aed, #3b82f6); box-shadow: 0 2px 10px rgba(124,58,237,0.5); transform: translateX(var(--thumb-x, 0px)); }
+    .cur-toggle span { position: relative; width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 13px; font-weight: 700; color: #9ca3af; transition: background 0.2s, color 0.2s; }
+    .cur-toggle span.on { color: #fff; }
     .haptic { position: absolute; inset: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .haptic input { position: absolute; width: 1px; height: 1px; margin: 0; visibility: hidden; }
     button:has(> .haptic) { position: relative; }
-    .result { margin-top: 16px; padding: 16px; border-radius: 14px; text-align: center; opacity: 0; transform: translateY(12px) scale(0.97); transition: opacity 0.4s ease, transform 0.4s ease; display: none; }
-    .result.show { display: block; opacity: 1; transform: translateY(0) scale(1); }
-    .result.profit { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(52,211,153,0.08)); border: 1px solid rgba(16,185,129,0.25); }
-    .result.loss { background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(248,113,113,0.08)); border: 1px solid rgba(239,68,68,0.25); }
+    .result { margin-top: 16px; padding: 16px; border-radius: 14px; text-align: center; display: none; }
+    .result.show { display: block; }
+    .result.profit { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(52,211,153,0.08)); border: 1px solid rgba(16,185,129,0.25); box-shadow: 0 14px 40px -16px rgba(16,185,129,0.55); }
+    .result.loss { background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(248,113,113,0.08)); border: 1px solid rgba(239,68,68,0.25); box-shadow: 0 14px 40px -16px rgba(239,68,68,0.5); }
     .result.neutral { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
-    .result-icon { font-size: 28px; margin-bottom: 4px; }
+    .result-icon { width: 44px; height: 44px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; }
+    .result-icon svg { width: 24px; height: 24px; }
+    .result-icon path { stroke-dasharray: 1; }
+    .profit .result-icon { background: rgba(16,185,129,0.15); color: #34d399; } .loss .result-icon { background: rgba(239,68,68,0.15); color: #f87171; } .neutral .result-icon { background: rgba(255,255,255,0.08); color: #9ca3af; }
     .result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 6px; }
     .profit .result-label { color: #34d399; } .loss .result-label { color: #f87171; } .neutral .result-label { color: #9ca3af; }
     .result-amount { font-size: 26px; font-weight: 800; margin-bottom: 2px; font-variant-numeric: tabular-nums; }
-    .profit .result-amount { color: #34d399; } .loss .result-amount { color: #f87171; } .neutral .result-amount { color: #d1d5db; }
+    .profit .result-amount { background: linear-gradient(90deg, #34d399, #6ee7b7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .loss .result-amount { background: linear-gradient(90deg, #f87171, #fb923c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .neutral .result-amount { color: #d1d5db; }
     .result-pct { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
     .profit .result-pct { color: #6ee7b7; } .loss .result-pct { color: #fca5a5; } .neutral .result-pct { color: #9ca3af; }
     .result-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -105,9 +117,50 @@
     .detail-box .dv { font-size: 13px; font-weight: 600; color: #d1d5db; margin-top: 1px; }
     .error-msg { color: #f87171; font-size: 12px; text-align: center; margin-top: 8px; opacity: 0; transition: opacity 0.3s; }
     .error-msg.show { opacity: 1; }
+    /* hover effects only where a real pointer hovers; on a phone they stick after a tap */
+    @media (hover: hover) {
+      .card:not(.keypad):hover { transform: translateY(-2px); }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.4); }
+      .btn:hover::after { transform: translateX(100%); }
+      .btn-clear:hover, .btn-kp:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); }
+      .clear-menu button:hover { background: rgba(167,139,250,0.18); color: #fff; }
+      .clear-menu button.clear-all:hover { background: rgba(239,68,68,0.18); color: #fca5a5; }
+      .cur-toggle:hover { border-color: rgba(167,139,250,0.4); }
+    }
+    @media (max-width: 360px) { .title-row h1 { font-size: 16px; } }
+    @media (prefers-reduced-motion: reduce) { .bg-particles { display: none; } }
+    /* every decorative animation: off when the phone asks for reduced motion */
+    @media (prefers-reduced-motion: no-preference) {
+      html:not(.intro-done) .card { animation: rise 0.6s var(--ease-out) backwards; }
+      html:not(.intro-done) .keypad { animation-delay: 0.1s; }
+      html:not(.intro-done) .card > :not(.result):not(.error-msg) { animation: fadeUp 0.5s var(--ease-out) backwards; animation-delay: calc(0.1s + var(--i, 0) * 45ms); }
+      .card > :nth-child(2) { --i: 1; } .card > :nth-child(3) { --i: 2; } .card > :nth-child(4) { --i: 3; } .card > :nth-child(5) { --i: 4; } .card > :nth-child(6) { --i: 5; } .card > :nth-child(7) { --i: 6; }
+      /* title shimmer: starts dim, one bright sweep right to left, then stays bright */
+      .logo h1 { -webkit-mask-image: linear-gradient(100deg, rgba(0,0,0,0.45) 0 35%, #000 65% 100%); mask-image: linear-gradient(100deg, rgba(0,0,0,0.45) 0 35%, #000 65% 100%); -webkit-mask-size: 300% 100%; mask-size: 300% 100%; -webkit-mask-position: 0% 0; mask-position: 0% 0; animation: titleShimmer 1.6s var(--ease-std) 0.45s 1 forwards; }
+      .result.show { animation: resultIn 0.55s var(--ease-spring); }
+      .result.show .result-icon { animation: pop 0.5s var(--ease-spring) 0.08s backwards; }
+      .result.show .result-icon path { animation: draw 0.8s var(--ease-out) 0.2s backwards; }
+      .error-msg.show { animation: shake 0.35s var(--ease-std); }
+      .btn.sweep::after { animation: sweep 0.7s var(--ease-std); }
+      .clear-menu.open > button { animation: itemIn 0.3s var(--ease-out) backwards; }
+      .clear-menu.open > button:nth-of-type(2) { animation-delay: 0.03s; } .clear-menu.open > button:nth-of-type(3) { animation-delay: 0.06s; } .clear-menu.open > button:nth-of-type(4) { animation-delay: 0.09s; } .clear-menu.open > button:nth-of-type(5) { animation-delay: 0.12s; }
+      .prefix.swap { animation: glyphIn 0.35s var(--ease-out); }
+      .cur-toggle::before { transition: transform 0.4s var(--ease-spring); }
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(16px) scale(0.985); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } }
+    @keyframes titleShimmer { to { -webkit-mask-position: 100% 0; mask-position: 100% 0; } }
+    @keyframes resultIn { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+    @keyframes pop { from { opacity: 0; transform: scale(0.5); } }
+    @keyframes draw { from { stroke-dashoffset: 1; } }
+    @keyframes shake { 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+    @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+    @keyframes itemIn { from { opacity: 0; transform: translateY(-4px); } }
+    @keyframes glyphIn { from { opacity: 0; transform: translateY(-6px); } }
   </style>
 </head>
 <body>
+  <div class="aurora" aria-hidden="true"></div>
   <div class="bg-particles" id="particles"></div>
   <div class="card">
     <div class="logo">
@@ -133,7 +186,7 @@
     <button class="btn" id="calcBtn">Calculate P&amp;L</button>
     <div class="error-msg" id="errorMsg"></div>
     <div class="result" id="result">
-      <div class="result-icon" id="resIcon"></div>
+      <div class="result-icon" id="resIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1"/></svg></div>
       <div class="result-label" id="resLabel"></div>
       <div class="result-amount" id="resAmount"></div>
       <div class="result-pct" id="resPct"></div>
@@ -162,7 +215,13 @@
   <script>
     (()=>{const c=document.getElementById('particles');for(let i=0;i<30;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.animationDuration=(6+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';s.style.width=s.style.height=(2+Math.random()*4)+'px';c.appendChild(s);}})();
     const $=id=>document.getElementById(id);
+    const motionOK=()=>matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    const restart=(el,cls)=>{el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);};  // replay a CSS animation
+    // Entrance: once it has played, switch it off so showing/hiding parts later doesn't replay it.
+    const introDone=()=>document.documentElement.classList.add('intro-done');
+    requestAnimationFrame(()=>{const a=(document.getAnimations?.()||[]).filter(x=>['rise','fadeUp'].includes(x.animationName));Promise.all(a.map(x=>x.finished)).then(introDone,introDone);});
     $('calcBtn').addEventListener('click',calculate);
+    $('calcBtn').addEventListener('click',()=>restart($('calcBtn'),'sweep'));
     document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
 
     // Haptic tick when a button is tapped on a phone. Android: navigator.vibrate. iPhone has no vibrate API, but Safari
@@ -235,20 +294,30 @@
 
     // Keypad types into the highlighted field: the last one tapped, starting on the first empty one.
     const keypad=$('keypad'),kpToggle=$('kpToggle');
-    let target=fields.find(f=>!f.value)||fields[0];
-    const setTarget=f=>{target=f;fields.forEach(x=>x.classList.toggle('kp-target',!keypad.hidden&&x===f));};
+    let target=fields.find(f=>!f.value)||fields[0],kpOn=true,kpAnim=null;
+    const setTarget=f=>{target=f;fields.forEach(x=>x.classList.toggle('kp-target',kpOn&&x===f));};
     const setKeypad=(show,animate)=>{
-      keypad.hidden=!show;
+      kpOn=show;
       kpToggle.setAttribute('aria-expanded',show);
       $('kpToggleLabel').textContent=show?'Hide Keypad':'Unhide Keypad';
       fields.forEach(f=>f.setAttribute('inputmode',show?'none':'decimal'));  // keypad showing = no phone keyboard popping up over it
       store.set(KP_KEY,show?'':'1');
       setTarget(target);
-      if(show&&animate){keypad.classList.remove('kp-in');void keypad.offsetWidth;keypad.classList.add('kp-in');}
+      const done=()=>{keypad.style.overflow='';keypad.hidden=!show;kpAnim=null;};
+      if(kpAnim){kpAnim.onfinish=done;kpAnim.reverse();return;}  // tapped again mid-fold: just turn around
+      if(!animate||!motionOK())return done();
+      // fold the keypad away (or open it) smoothly; the main card glides back to the middle with it
+      keypad.hidden=false;
+      const cs=getComputedStyle(keypad),gap=parseFloat(getComputedStyle(document.body).rowGap)||0;
+      const open={height:keypad.offsetHeight+'px',paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom,marginTop:'0px',opacity:1,transform:'none'};
+      const shut={height:'0px',paddingTop:'0px',paddingBottom:'0px',marginTop:-gap+'px',opacity:0,transform:'translateY(10px) scale(0.98)'};
+      keypad.style.overflow='hidden';
+      kpAnim=keypad.animate(show?[shut,open]:[open,shut],{duration:show?340:260,easing:show?'cubic-bezier(0.16,1,0.3,1)':'cubic-bezier(0.4,0,0.2,1)'});
+      kpAnim.onfinish=done;
     };
     kpToggle.addEventListener('click',()=>{
       if(fields.includes(document.activeElement))document.activeElement.blur();  // next tap on a field opens it in the new mode
-      setKeypad(keypad.hidden,true);
+      setKeypad(!kpOn,true);  // kpOn, not keypad.hidden: hidden only flips when the fold animation ends
     });
     const press=k=>{
       const f=target,v=f.value,focused=document.activeElement===f;
@@ -257,9 +326,11 @@
       if(s===end){if(!s)return;s--;if(v[s]===groupSep()&&s)s--;}  // backspace hops over a comma
       splice(f,s,end,'');
     };
+    // ripple spreading from where the key was touched
+    const ripple=(b,e)=>{const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2.2,s=document.createElement('span');s.className='ripple';s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;s.addEventListener('animationend',()=>s.remove());b.append(s);};
     keypad.querySelectorAll('.kp-key').forEach(b=>{
       // mouse: keep focus + caret in the field. Not on touch: iPhone Safari then drops the tap's click.
-      b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')e.preventDefault();b.classList.add('pressed');});
+      b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')e.preventDefault();if(motionOK())ripple(b,e);b.classList.add('pressed');});
       ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,()=>b.classList.remove('pressed')));
       b.addEventListener('click',()=>press(b.dataset.key));
     });
@@ -268,15 +339,16 @@
     // Currency toggle (top right of the title): steps to the next currency and regroups everything shown.
     const curBtn=$('curToggle');
     let last=null;  // last result, redrawn when the currency changes
-    const setCurrency=c=>{
+    const setCurrency=(c,animate)=>{
       cur=c;store.set(CUR_KEY,c==='USD'?'':c);
-      document.querySelectorAll('.prefix').forEach(p=>p.textContent=CURRENCIES[c].sym);
-      curBtn.querySelectorAll('[data-cur]').forEach(s=>s.classList.toggle('on',s.dataset.cur===c));
+      document.querySelectorAll('.prefix').forEach(p=>{p.textContent=CURRENCIES[c].sym;if(animate)restart(p,'swap');});
+      // the lit thumb slides to whichever symbol is active
+      curBtn.querySelectorAll('[data-cur]').forEach(s=>{const on=s.dataset.cur===c;s.classList.toggle('on',on);if(on)curBtn.style.setProperty('--thumb-x',(s.offsetLeft-2)+'px');});
       curBtn.setAttribute('aria-label','Currency '+CURRENCIES[c].sym+', tap to switch');
       fields.forEach(f=>reformat(f));
       renderResult();
     };
-    curBtn.addEventListener('click',()=>{const codes=Object.keys(CURRENCIES);setCurrency(codes[(codes.indexOf(cur)+1)%codes.length]);});
+    curBtn.addEventListener('click',()=>{const codes=Object.keys(CURRENCIES);setCurrency(codes[(codes.indexOf(cur)+1)%codes.length],true);});
     setCurrency(cur);
 
     // Clear Fields — supports BOTH tap-to-open-then-click AND press-and-hold-drag-release.
@@ -288,11 +360,12 @@
     const runClear=b=>{
       if(!b)return;
       const ids=b.dataset.clear.split(',');
-      ids.forEach(id=>{$(id).value='';});
+      ids.forEach(id=>{const f=$(id);if(f.value&&motionOK())f.animate([{backgroundColor:'rgba(167,139,250,0.25)'},{backgroundColor:'rgba(255,255,255,0.05)'}],{duration:500,easing:'ease-out'});f.value='';});
       store.set(INV_KEY,clean(fields[0].value));  // Clear Investment / Clear All also forget the saved amount
       setTarget($(ids[0]));                // keypad moves to the field just cleared
       $('result').classList.remove('show','profit','loss','neutral');
       $('errorMsg').classList.remove('show');
+      document.body.classList.remove('mood-profit','mood-loss');
       closeMenu();
     };
     // option under a screen point (for hold-drag), or null
@@ -328,26 +401,35 @@
 
     document.addEventListener('click',e=>{if(!clearMenu.contains(e.target)&&e.target!==clearBtn&&!clearBtn.contains(e.target))closeMenu();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
-    function renderResult(){
+    const ICON={profit:'M3 17l6-6 4 4 8-8M15 7h6v6',loss:'M3 7l6 6 4-4 8 8M15 17h6v-6',neutral:'M4 12h16'};
+    let countRaf=0;
+    function renderResult(animate){
       if(!last)return;
+      cancelAnimationFrame(countRaf);$('resAmount').classList.remove('counting');
       const {pl,plPct,shares,currentValue}=last,sym=CURRENCIES[cur].sym;
-      $('resAmount').textContent=(pl>=0?'+':'-')+sym+fmt(Math.abs(pl));
-      $('resPct').textContent=(plPct>=0?'+':'')+fmt(plPct)+'%';
+      const paint=k=>{$('resAmount').textContent=(pl>=0?'+':'-')+sym+fmt(Math.abs(pl*k));$('resPct').textContent=(plPct>=0?'+':'')+fmt(plPct*k)+'%';};
       $('resShares').textContent=fmt(shares);
       $('resValue').textContent=sym+fmt(currentValue);
+      if(!animate||!motionOK())return paint(1);
+      // count up from zero: quick start, gentle landing on the exact value
+      const t0=performance.now(),D=800;$('resAmount').classList.add('counting');
+      const step=t=>{const k=Math.min(1,(t-t0)/D);paint(k<1?1-Math.pow(2,-10*k):1);if(k<1)countRaf=requestAnimationFrame(step);else $('resAmount').classList.remove('counting');};
+      countRaf=requestAnimationFrame(step);
     }
     function calculate(){
       const errEl=$('errorMsg'),resEl=$('result');
       errEl.classList.remove('show');resEl.classList.remove('show','profit','loss','neutral');
+      document.body.classList.remove('mood-profit','mood-loss');
       const [investment,buyPrice,currentPrice]=fields.map(num);
-      if([investment,buyPrice,currentPrice].some(v=>isNaN(v)||v<0)){errEl.textContent='Please enter valid positive numbers for all fields.';errEl.classList.add('show');return;}
-      if(buyPrice===0){errEl.textContent='Purchase price cannot be zero.';errEl.classList.add('show');return;}
+      if([investment,buyPrice,currentPrice].some(v=>isNaN(v)||v<0)){errEl.textContent='Please enter valid positive numbers for all fields.';restart(errEl,'show');return;}
+      if(buyPrice===0){errEl.textContent='Purchase price cannot be zero.';restart(errEl,'show');return;}
       const shares=investment/buyPrice,currentValue=shares*currentPrice,pl=currentValue-investment,plPct=((currentPrice-buyPrice)/buyPrice)*100;
       const isProfit=pl>0,isLoss=pl<0,type=isProfit?'profit':isLoss?'loss':'neutral';
-      $('resIcon').textContent=isProfit?'\u{1F4C8}':isLoss?'\u{1F4C9}':'\u2796';
+      $('resIcon').querySelector('path').setAttribute('d',ICON[type]);
       $('resLabel').textContent=isProfit?'Total Profit':isLoss?'Total Loss':'Break Even';
-      last={pl,plPct,shares,currentValue};renderResult();
-      resEl.classList.add(type);requestAnimationFrame(()=>resEl.classList.add('show'));
+      last={pl,plPct,shares,currentValue};renderResult(true);
+      if(type!=='neutral')document.body.classList.add('mood-'+type);
+      void resEl.offsetWidth;resEl.classList.add(type,'show');  // same frame as the hide, so the card replays its entrance without flickering
     }
   </script>
 </body>
