@@ -9,9 +9,10 @@
   <meta name="apple-mobile-web-app-title" content="Stock P&L">
   <meta name="theme-color" content="#0f0c29">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23302b63' width='100' height='100' rx='20'/><text y='70' x='15' font-size='60'>📈</text></svg>">
+  <script>try{var t=localStorage.getItem('plCalc.theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root { --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); --ease-std: cubic-bezier(0.4, 0, 0.2, 1); }
+    :root { color-scheme: dark; --flash: rgba(167,139,250,0.25); --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); --ease-std: cubic-bezier(0.4, 0, 0.2, 1); }
     button, input { font-family: inherit; }
     ::selection { background: rgba(167,139,250,0.35); }
     html { background: #0f0c29; }
@@ -45,7 +46,7 @@
     /* lit edge: a hairline gradient border on the main card */
     .card:not(.keypad)::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgba(167,139,250,0.55), rgba(96,165,250,0.08) 35%, transparent 60%, rgba(96,165,250,0.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
     .logo { text-align: center; margin-bottom: 18px; }
-    .logo svg { width: 36px; height: 36px; margin-bottom: 4px; }
+    .logo-mark { width: 36px; height: 36px; margin-bottom: 4px; }
     .logo h1 { font-size: 18px; font-weight: 700; background: linear-gradient(90deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .logo p { font-size: 12px; color: #9ca3af; margin-top: 2px; }
     .field { margin-bottom: 12px; }
@@ -91,6 +92,16 @@
     .cur-toggle::before { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 22px; border-radius: 999px; background: linear-gradient(135deg, #7c3aed, #3b82f6); box-shadow: 0 2px 10px rgba(124,58,237,0.5); transform: translateX(var(--thumb-x, 0px)); }
     .cur-toggle span { position: relative; width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 13px; font-weight: 700; color: #9ca3af; transition: background 0.2s, color 0.2s; }
     .cur-toggle span.on { color: #fff; }
+    .theme-wrap { position: relative; grid-column: 1; justify-self: start; }
+    .theme-btn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #cbd5e1; cursor: pointer; transition: border-color 0.2s, background 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    .theme-btn svg { width: 16px; height: 16px; }
+    .theme-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 196px; text-align: left; background: rgba(30,27,55,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 6; opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; }
+    .theme-menu.open { opacity: 1; transform: none; pointer-events: auto; }
+    .theme-menu button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: transparent; border: none; border-radius: 8px; color: #e0e0e0; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; user-select: none; -webkit-user-select: none; transition: background 0.15s, color 0.15s; }
+    .theme-menu .swatch { width: 18px; height: 18px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); box-shadow: 0 0 0 1px rgba(255,255,255,0.25); }
+    .theme-menu .check { width: 16px; height: 16px; margin-left: auto; opacity: 0; color: #a78bfa; }
+    .theme-menu [aria-checked="true"] .check { opacity: 1; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.45s; animation-timing-function: var(--ease-std); }
     .haptic { position: absolute; inset: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .haptic input { position: absolute; width: 1px; height: 1px; margin: 0; visibility: hidden; }
     button:has(> .haptic) { position: relative; }
@@ -125,9 +136,11 @@
       .btn-clear:hover, .btn-kp:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); }
       .clear-menu button:hover { background: rgba(167,139,250,0.18); color: #fff; }
       .clear-menu button.clear-all:hover { background: rgba(239,68,68,0.18); color: #fca5a5; }
-      .cur-toggle:hover { border-color: rgba(167,139,250,0.4); }
+      .cur-toggle:hover, .theme-btn:hover { border-color: rgba(167,139,250,0.4); }
+      .theme-menu button:hover { background: rgba(167,139,250,0.18); color: #fff; }
     }
-    @media (max-width: 360px) { .title-row h1 { font-size: 16px; } }
+    @media (max-width: 360px) { .card:not(.keypad) { padding-left: 20px; padding-right: 20px; } .title-row h1 { font-size: 16px; } }
+    @media (max-width: 330px) { .title-row h1 { font-size: 15px; } }
     @media (prefers-reduced-motion: reduce) { .bg-particles { display: none; } }
     /* every decorative animation: off when the phone asks for reduced motion */
     @media (prefers-reduced-motion: no-preference) {
@@ -157,6 +170,144 @@
     @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
     @keyframes itemIn { from { opacity: 0; transform: translateY(-4px); } }
     @keyframes glyphIn { from { opacity: 0; transform: translateY(-6px); } }
+    /* ===== Theme: Black Glass (iOS dark mode: frosted glass over black, system colors) ===== */
+    html[data-theme="glass"] { background: #000; --flash: rgba(10,132,255,0.35); }
+    html[data-theme="glass"] body { background: #000; color: #fff; font-family: -apple-system, system-ui, 'Segoe UI', sans-serif; }
+    html[data-theme="glass"] .bg-particles { display: none; }
+    html[data-theme="glass"] .aurora { background: radial-gradient(45% 35% at 12% 6%, rgba(10,132,255,0.32), transparent 70%), radial-gradient(50% 40% at 92% 96%, rgba(94,92,230,0.30), transparent 70%), radial-gradient(35% 30% at 88% 28%, rgba(100,210,255,0.10), transparent 70%); }
+    html[data-theme="glass"] .aurora::before { background: radial-gradient(60% 45% at 50% 50%, rgba(48,209,88,0.24), transparent 70%); }
+    html[data-theme="glass"] .aurora::after { background: radial-gradient(60% 45% at 50% 50%, rgba(255,69,58,0.22), transparent 70%); }
+    html[data-theme="glass"] .card { background: rgba(28,28,30,0.55); -webkit-backdrop-filter: blur(40px) saturate(180%); backdrop-filter: blur(40px) saturate(180%); border: 0.5px solid rgba(255,255,255,0.16); border-radius: 28px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 24px 48px rgba(0,0,0,0.55); }
+    html[data-theme="glass"] .card:not(.keypad)::before { background: linear-gradient(160deg, rgba(255,255,255,0.45), rgba(255,255,255,0.06) 28%, transparent 55%, rgba(255,255,255,0.16)); }
+    html[data-theme="glass"] .logo h1 { background: none; -webkit-text-fill-color: #fff; color: #fff; letter-spacing: -0.2px; }
+    html[data-theme="glass"] .logo p, html[data-theme="glass"] .field label { color: rgba(235,235,245,0.6); }
+    html[data-theme="glass"] .field input { background: rgba(118,118,128,0.24); border-color: transparent; border-radius: 12px; color: #fff; caret-color: #0a84ff; }
+    html[data-theme="glass"] .field input::placeholder { color: rgba(235,235,245,0.3); }
+    html[data-theme="glass"] .field input:focus, html[data-theme="glass"] .field input.kp-target { border-color: #0a84ff; box-shadow: 0 0 0 3px rgba(10,132,255,0.25); }
+    html[data-theme="glass"] .field .prefix { color: rgba(235,235,245,0.45); }
+    html[data-theme="glass"] .field input:focus ~ .prefix, html[data-theme="glass"] .field input:not(:placeholder-shown) ~ .prefix, html[data-theme="glass"] .field input.kp-target ~ .prefix { color: #0a84ff; }
+    html[data-theme="glass"] .btn-clear, html[data-theme="glass"] .btn-kp { background: rgba(118,118,128,0.24); border-color: transparent; border-radius: 14px; color: #fff; }
+    html[data-theme="glass"] .btn { background: #0a84ff; border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.25); }
+    html[data-theme="glass"] .clear-menu, html[data-theme="glass"] .theme-menu { background: rgba(37,37,40,0.9); -webkit-backdrop-filter: blur(40px) saturate(180%); backdrop-filter: blur(40px) saturate(180%); border: 0.5px solid rgba(255,255,255,0.14); border-radius: 14px; }
+    html[data-theme="glass"] .clear-menu button, html[data-theme="glass"] .theme-menu button { color: #fff; }
+    html[data-theme="glass"] .clear-menu .divider { background: rgba(84,84,88,0.65); }
+    html[data-theme="glass"] .clear-menu button.hot { background: rgba(255,255,255,0.12); color: #fff; }
+    html[data-theme="glass"] .clear-menu button.clear-all { color: #ff453a; }
+    html[data-theme="glass"] .clear-menu button.clear-all.hot { background: rgba(255,69,58,0.18); color: #ff453a; }
+    html[data-theme="glass"] .theme-menu .check { color: #0a84ff; }
+    html[data-theme="glass"] .theme-btn { background: rgba(118,118,128,0.24); border-color: transparent; color: #fff; }
+    html[data-theme="glass"] .cur-toggle { background: rgba(118,118,128,0.24); border-color: transparent; border-radius: 9px; }
+    html[data-theme="glass"] .cur-toggle::before { background: #636366; border-radius: 7px; box-shadow: 0 3px 8px rgba(0,0,0,0.35); }
+    html[data-theme="glass"] .cur-toggle span { border-radius: 7px; color: rgba(235,235,245,0.6); }
+    html[data-theme="glass"] .cur-toggle span.on { color: #fff; }
+    html[data-theme="glass"] .kp-key { background: rgba(255,255,255,0.18); border-color: transparent; border-radius: 10px; font-size: 24px; font-weight: 400; box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+    html[data-theme="glass"] .kp-key.kp-fn { background: rgba(255,255,255,0.08); color: #fff; }
+    html[data-theme="glass"] .kp-key.pressed { background: rgba(255,255,255,0.38); border-color: transparent; }
+    html[data-theme="glass"] .ripple { display: none; }
+    html[data-theme="glass"] .error-msg { color: #ff453a; }
+    html[data-theme="glass"] .result.profit { background: rgba(48,209,88,0.12); border-color: rgba(48,209,88,0.3); box-shadow: 0 14px 40px -16px rgba(48,209,88,0.5); }
+    html[data-theme="glass"] .result.loss { background: rgba(255,69,58,0.12); border-color: rgba(255,69,58,0.3); box-shadow: 0 14px 40px -16px rgba(255,69,58,0.45); }
+    html[data-theme="glass"] .result.neutral { background: rgba(118,118,128,0.16); }
+    html[data-theme="glass"] .profit .result-label, html[data-theme="glass"] .profit .result-pct { color: #30d158; }
+    html[data-theme="glass"] .loss .result-label, html[data-theme="glass"] .loss .result-pct { color: #ff453a; }
+    html[data-theme="glass"] .profit .result-amount { background: none; color: #30d158; -webkit-text-fill-color: #30d158; }
+    html[data-theme="glass"] .loss .result-amount { background: none; color: #ff453a; -webkit-text-fill-color: #ff453a; }
+    html[data-theme="glass"] .profit .result-icon { background: rgba(48,209,88,0.18); color: #30d158; }
+    html[data-theme="glass"] .loss .result-icon { background: rgba(255,69,58,0.18); color: #ff453a; }
+    html[data-theme="glass"] .detail-box { background: rgba(118,118,128,0.16); }
+    html[data-theme="glass"] .detail-box .dl { color: rgba(235,235,245,0.5); }
+    html[data-theme="glass"] .detail-box .dv { color: #fff; }
+    html[data-theme="glass"] ::selection { background: rgba(10,132,255,0.45); }
+    @media (hover: hover) {
+      html[data-theme="glass"] .btn-clear:hover, html[data-theme="glass"] .btn-kp:hover, html[data-theme="glass"] .theme-btn:hover { background: rgba(118,118,128,0.34); border-color: transparent; }
+      html[data-theme="glass"] .btn:hover { box-shadow: 0 6px 24px rgba(10,132,255,0.45); }
+      html[data-theme="glass"] .kp-key:hover { background: rgba(255,255,255,0.26); border-color: transparent; }
+      html[data-theme="glass"] .kp-key.pressed { background: rgba(255,255,255,0.38); }
+      html[data-theme="glass"] .clear-menu button:hover, html[data-theme="glass"] .theme-menu button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+      html[data-theme="glass"] .clear-menu button.clear-all:hover { background: rgba(255,69,58,0.18); color: #ff453a; }
+      html[data-theme="glass"] .cur-toggle:hover { border-color: transparent; }
+    }
+
+    /* ===== Theme: Minimal White (after CRED's NeoPOP: black on white, sharp corners, 3D buttons that plunk) ===== */
+    html[data-theme="minimal"] { background: #f0f0ee; color-scheme: light; --flash: rgba(20,76,199,0.14); }
+    html[data-theme="minimal"] body { background: #f0f0ee; color: #0d0d0d; }
+    html[data-theme="minimal"] body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: #0d0d0d; z-index: 20; pointer-events: none; }  /* home-screen app: keeps the white status-bar text readable */
+    html[data-theme="minimal"] .bg-particles, html[data-theme="minimal"] .aurora { display: none; }
+    html[data-theme="minimal"] .card { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; border: 1px solid #e0e0e0; border-radius: 0; box-shadow: none; }
+    html[data-theme="minimal"] .card:not(.keypad)::before { display: none; }
+    html[data-theme="minimal"] .logo-mark rect, html[data-theme="minimal"] .logo-mark circle { fill: #0d0d0d; }
+    html[data-theme="minimal"] .logo-mark path { stroke: #0d0d0d; }
+    html[data-theme="minimal"] .logo h1 { background: none; -webkit-text-fill-color: #0d0d0d; color: #0d0d0d; font-family: ui-serif, 'New York', Georgia, 'Times New Roman', serif; font-size: 18px; letter-spacing: -0.2px; }
+    html[data-theme="minimal"] .logo p { color: rgba(13,13,13,0.5); }
+    html[data-theme="minimal"] .field label { color: rgba(13,13,13,0.55); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+    html[data-theme="minimal"] .field input { background: transparent; border: none; border-bottom: 1.5px solid #0d0d0d; border-radius: 0; padding-left: 18px; color: #0d0d0d; font-size: 16px; font-weight: 600; caret-color: #144cc7; }
+    html[data-theme="minimal"] .field input::placeholder { color: rgba(13,13,13,0.25); }
+    html[data-theme="minimal"] .field input:focus, html[data-theme="minimal"] .field input.kp-target { border-color: #144cc7; box-shadow: 0 1.5px 0 #144cc7; }
+    html[data-theme="minimal"] .field .prefix { left: 0; font-size: 16px; font-weight: 600; color: rgba(13,13,13,0.35); }
+    html[data-theme="minimal"] .field input:focus ~ .prefix, html[data-theme="minimal"] .field input:not(:placeholder-shown) ~ .prefix, html[data-theme="minimal"] .field input.kp-target ~ .prefix { color: #0d0d0d; }
+    /* NeoPOP buttons: a flat face plus a 3px right edge and bottom edge slanted at 45deg; pressing plunks the face into them */
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key) { border-radius: 0; overflow: visible; box-shadow: none; transition: transform 0.12s ease-in-out; }
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::before, html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::after { content: ''; position: absolute; pointer-events: none; transform-origin: 0 0; transition: transform 0.12s ease-in-out; }
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::before { top: -1px; right: -4px; bottom: auto; left: auto; width: 3px; height: calc(100% + 2px); background: var(--edge-r); transform: skewY(45deg); }
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::after { left: -1px; bottom: -4px; top: auto; right: auto; width: calc(100% + 2px); height: 3px; background: var(--edge-b); transform: skewX(45deg); }
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active) { transform: translate(3px, 3px); }
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::before { transform: skewY(45deg) scaleX(0); }
+    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::after { transform: skewX(45deg) scaleY(0); }
+    html[data-theme="minimal"] .btn { background: #0d0d0d; color: #fff; border: 1px solid #0d0d0d; --edge-r: #8a8a8a; --edge-b: #3d3d3d; margin-top: 10px; font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
+    html[data-theme="minimal"] .btn.sweep::after { animation: none; }
+    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { background: #fff; color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+    html[data-theme="minimal"] .clear-wrap, html[data-theme="minimal"] .btn-kp { margin-top: 10px; }
+    html[data-theme="minimal"] .kp-key { background: #fff; color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-weight: 600; }
+    html[data-theme="minimal"] .kp-key.kp-fn { background: #0d0d0d; color: #fff; border-color: #0d0d0d; --edge-r: #8a8a8a; --edge-b: #3d3d3d; }
+    html[data-theme="minimal"] .kp-key.pressed { background: #fff; border-color: #0d0d0d; }
+    html[data-theme="minimal"] .kp-key.kp-fn.pressed { background: #0d0d0d; }
+    html[data-theme="minimal"] .ripple { display: none; }
+    html[data-theme="minimal"] .kp-grid { gap: 10px; }
+    html[data-theme="minimal"] .clear-menu, html[data-theme="minimal"] .theme-menu { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; border: 1px solid #0d0d0d; border-radius: 0; box-shadow: 4px 4px 0 #0d0d0d; }
+    html[data-theme="minimal"] .clear-menu button, html[data-theme="minimal"] .theme-menu button { color: #0d0d0d; border-radius: 0; }
+    html[data-theme="minimal"] .clear-menu .divider { background: #e0e0e0; }
+    html[data-theme="minimal"] .clear-menu button.hot { background: #f0f0ee; color: #0d0d0d; }
+    html[data-theme="minimal"] .clear-menu button.clear-all { color: #d63a24; }
+    html[data-theme="minimal"] .clear-menu button.clear-all.hot { background: #fdeceb; color: #d63a24; }
+    html[data-theme="minimal"] .theme-menu .swatch { border-radius: 0; box-shadow: 0 0 0 1px #0d0d0d; }
+    html[data-theme="minimal"] .theme-menu .check { color: #0d0d0d; }
+    html[data-theme="minimal"] .theme-btn { border-radius: 0; border-color: #0d0d0d; background: #fff; color: #0d0d0d; }
+    html[data-theme="minimal"] .cur-toggle { background: #fff; border-color: #0d0d0d; border-radius: 0; }
+    html[data-theme="minimal"] .cur-toggle::before { background: #0d0d0d; border-radius: 0; box-shadow: none; }
+    html[data-theme="minimal"] .cur-toggle span { border-radius: 0; color: rgba(13,13,13,0.5); }
+    html[data-theme="minimal"] .cur-toggle span.on { color: #fff; }
+    html[data-theme="minimal"] .error-msg { color: #d63a24; }
+    html[data-theme="minimal"] .result { border-radius: 0; }
+    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: #fff; border: 1px solid #e0e0e0; box-shadow: none; }
+    html[data-theme="minimal"] .result.profit { border-top: 3px solid #06c270; }
+    html[data-theme="minimal"] .result.loss { border-top: 3px solid #ee4d37; }
+    html[data-theme="minimal"] .result.neutral { border-top: 3px solid #0d0d0d; }
+    html[data-theme="minimal"] .profit .result-label, html[data-theme="minimal"] .profit .result-pct { color: #1e8057; }
+    html[data-theme="minimal"] .loss .result-label, html[data-theme="minimal"] .loss .result-pct { color: #d63a24; }
+    html[data-theme="minimal"] .profit .result-amount { background: none; color: #1e8057; -webkit-text-fill-color: #1e8057; }
+    html[data-theme="minimal"] .loss .result-amount { background: none; color: #d63a24; -webkit-text-fill-color: #d63a24; }
+    html[data-theme="minimal"] .neutral .result-amount, html[data-theme="minimal"] .neutral .result-label, html[data-theme="minimal"] .neutral .result-pct { color: #0d0d0d; }
+    html[data-theme="minimal"] .result-icon { border-radius: 0; }
+    html[data-theme="minimal"] .profit .result-icon { background: rgba(6,194,112,0.12); color: #06c270; }
+    html[data-theme="minimal"] .loss .result-icon { background: rgba(238,77,55,0.12); color: #ee4d37; }
+    html[data-theme="minimal"] .neutral .result-icon { background: #f0f0ee; color: #0d0d0d; }
+    html[data-theme="minimal"] .detail-box { background: #f7f7f5; border-radius: 0; }
+    html[data-theme="minimal"] .detail-box .dl { color: rgba(13,13,13,0.5); }
+    html[data-theme="minimal"] .detail-box .dv { color: #0d0d0d; }
+    html[data-theme="minimal"] ::selection { background: rgba(20,76,199,0.2); }
+    @media (hover: hover) {
+      html[data-theme="minimal"] .card:not(.keypad):hover { transform: none; }
+      html[data-theme="minimal"] .btn:hover { transform: none; box-shadow: none; }
+      html[data-theme="minimal"] .btn:hover::after { transform: skewX(45deg); }
+      html[data-theme="minimal"] .btn-clear:hover, html[data-theme="minimal"] .btn-kp:hover, html[data-theme="minimal"] .kp-key:hover, html[data-theme="minimal"] .theme-btn:hover { background: #f7f7f5; border-color: #0d0d0d; }
+      html[data-theme="minimal"] .kp-key.kp-fn:hover { background: #262626; }
+      html[data-theme="minimal"] .clear-menu button:hover, html[data-theme="minimal"] .theme-menu button:hover { background: #f0f0ee; color: #0d0d0d; }
+      html[data-theme="minimal"] .clear-menu button.clear-all:hover { background: #fdeceb; color: #d63a24; }
+      html[data-theme="minimal"] .cur-toggle:hover { border-color: #0d0d0d; }
+      html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active) { transform: translate(3px, 3px); }
+    }
+    @media (max-width: 360px) { html[data-theme="minimal"] .logo h1 { font-size: 16px; } }
+    @media (max-width: 330px) { html[data-theme="minimal"] .logo h1 { font-size: 14px; } }
   </style>
 </head>
 <body>
@@ -164,8 +315,8 @@
   <div class="bg-particles" id="particles"></div>
   <div class="card">
     <div class="logo">
-      <svg viewBox="0 0 48 48" fill="none"><rect x="4" y="28" width="8" height="16" rx="2" fill="#7c3aed" opacity="0.7"/><rect x="16" y="18" width="8" height="26" rx="2" fill="#3b82f6" opacity="0.8"/><rect x="28" y="8" width="8" height="36" rx="2" fill="#60a5fa" opacity="0.9"/><path d="M8 26L20 16L32 6L44 2" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="44" cy="2" r="3" fill="#a78bfa"/></svg>
-      <div class="title-row"><h1>Stock P&amp;L Calculator</h1><button type="button" class="cur-toggle" id="curToggle"><span data-cur="USD">$</span><span data-cur="INR">₹</span></button></div>
+      <svg class="logo-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="4" y="28" width="8" height="16" rx="2" fill="#7c3aed" opacity="0.7"/><rect x="16" y="18" width="8" height="26" rx="2" fill="#3b82f6" opacity="0.8"/><rect x="28" y="8" width="8" height="36" rx="2" fill="#60a5fa" opacity="0.9"/><path d="M8 26L20 16L32 6L44 2" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="44" cy="2" r="3" fill="#a78bfa"/></svg>
+      <div class="title-row"><div class="theme-wrap"><button type="button" class="theme-btn" id="themeBtn" aria-haspopup="true" aria-expanded="false" aria-label="Theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button><div class="theme-menu" id="themeMenu" role="menu"></div></div><h1>Stock P&amp;L Calculator</h1><button type="button" class="cur-toggle" id="curToggle"><span data-cur="USD">$</span><span data-cur="INR">₹</span></button></div>
       <p>Calculate your profit or loss instantly</p>
     </div>
     <div class="field"><label>Investment Amount</label><div class="input-wrap"><input type="text" inputmode="decimal" autocomplete="off" id="investment" placeholder="0.00"><span class="prefix">$</span></div></div>
@@ -215,6 +366,15 @@
   <script>
     (()=>{const c=document.getElementById('particles');for(let i=0;i<30;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.animationDuration=(6+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';s.style.width=s.style.height=(2+Math.random()*4)+'px';c.appendChild(s);}})();
     const $=id=>document.getElementById(id);
+    // Themes: chosen from the round button left of the title. <head> applies the saved one before first paint.
+    const THEME_KEY='plCalc.theme';
+    const THEMES=[
+      {id:'midnight',name:'Midnight',meta:'#0f0c29',swatch:['#302b63','#a78bfa']},
+      {id:'glass',name:'Black Glass',meta:'#000000',swatch:['#000000','#0a84ff']},
+      {id:'minimal',name:'Minimal White',meta:'#f0f0ee',swatch:['#ffffff','#0d0d0d']},
+    ];
+    const themeBtn=$('themeBtn'),themeMenu=$('themeMenu');
+    THEMES.forEach(t=>{const b=document.createElement('button');b.type='button';b.dataset.themeId=t.id;b.setAttribute('role','menuitemradio');b.innerHTML=`<span class="swatch" style="--a:${t.swatch[0]};--b:${t.swatch[1]}"></span><span>${t.name}</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;themeMenu.append(b);});
     const motionOK=()=>matchMedia('(prefers-reduced-motion: no-preference)').matches;
     const restart=(el,cls)=>{el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);};  // replay a CSS animation
     // Entrance: once it has played, switch it off so showing/hiding parts later doesn't replay it.
@@ -238,6 +398,9 @@
       l.append(sw);b.append(l);
     });
     document.addEventListener('click',e=>{if(e.target.closest?.('button'))haptic();});
+    // .pressed while a finger or mouse is down on any button (drives press styles; iPhone ignores :active without it)
+    document.addEventListener('pointerdown',e=>{const b=e.target.closest?.('button');if(b)b.classList.add('pressed');},true);
+    ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>document.querySelectorAll('button.pressed').forEach(b=>b.classList.remove('pressed')),true));
 
     // Investment amount is saved on this device and put back on every visit, until cleared from the Clear Fields menu.
     const INV_KEY='plCalc.investment',KP_KEY='plCalc.keypadHidden';
@@ -246,6 +409,23 @@
       set:(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);}catch(e){}}  // empty value = forget it
     };
     const fields=['investment','buyPrice','currentPrice'].map($);
+
+    const applyTheme=(id,animate)=>{
+      const t=THEMES.find(x=>x.id===id)||THEMES[0];
+      const go=()=>{
+        document.documentElement.dataset.theme=t.id;
+        document.querySelector('meta[name="theme-color"]').content=t.meta;
+        themeMenu.querySelectorAll('[data-theme-id]').forEach(b=>b.setAttribute('aria-checked',b.dataset.themeId===t.id));
+        store.set(THEME_KEY,t.id===THEMES[0].id?'':t.id);
+      };
+      if(animate&&motionOK()&&document.startViewTransition)document.startViewTransition(go);else go();  // whole page cross-fades into the new theme
+    };
+    const closeThemeMenu=()=>{themeMenu.classList.remove('open');themeBtn.setAttribute('aria-expanded','false');};
+    themeBtn.addEventListener('click',()=>{const open=!themeMenu.classList.contains('open');themeMenu.classList.toggle('open',open);themeBtn.setAttribute('aria-expanded',open);});
+    themeMenu.addEventListener('click',e=>{const b=e.target.closest('[data-theme-id]');if(!b)return;applyTheme(b.dataset.themeId,true);closeThemeMenu();});
+    document.addEventListener('click',e=>{if(!e.target.closest('.theme-wrap'))closeThemeMenu();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeThemeMenu();});
+    applyTheme(document.documentElement.dataset.theme,false);
 
     // Currency: only the symbol and the digit grouping change (the locale decides: $ 1,234,567 / ₹ 12,34,567).
     const CUR_KEY='plCalc.currency';
@@ -360,7 +540,7 @@
     const runClear=b=>{
       if(!b)return;
       const ids=b.dataset.clear.split(',');
-      ids.forEach(id=>{const f=$(id);if(f.value&&motionOK())f.animate([{backgroundColor:'rgba(167,139,250,0.25)'},{backgroundColor:'rgba(255,255,255,0.05)'}],{duration:500,easing:'ease-out'});f.value='';});
+      ids.forEach(id=>{const f=$(id);if(f.value&&motionOK())f.animate([{backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--flash').trim()},{backgroundColor:getComputedStyle(f).backgroundColor}],{duration:500,easing:'ease-out'});f.value='';});
       store.set(INV_KEY,clean(fields[0].value));  // Clear Investment / Clear All also forget the saved amount
       setTarget($(ids[0]));                // keypad moves to the field just cleared
       $('result').classList.remove('show','profit','loss','neutral');
