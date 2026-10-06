@@ -85,7 +85,7 @@
     .kp-key.kp-fn { color: #c4b5fd; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.18); }
     .kp-key svg { width: 24px; height: 24px; }
     @media (hover: hover) { .kp-key:hover { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.35); } }
-    .kp-key.pressed { background: rgba(167,139,250,0.28); border-color: rgba(167,139,250,0.55); transform: scale(0.96); }
+    .kp-key.pressed { background: rgba(167,139,250,0.28); border-color: rgba(167,139,250,0.55); transform: scale(0.96); transition-duration: 0s; }
     .title-row { display: grid; grid-template-columns: minmax(0,1fr) auto 1fr; align-items: center; gap: 6px; }
     .title-row h1 { grid-column: 2; white-space: nowrap; }
     .cur-toggle { grid-column: 3; justify-self: end; display: flex; gap: 2px; padding: 2px; border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; background: rgba(255,255,255,0.06); cursor: pointer; position: relative; transition: border-color 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -198,14 +198,16 @@
     html[data-theme="glass"] .field .prefix { color: rgba(235,235,245,0.5); }
     html[data-theme="glass"] .field input:focus ~ .prefix, html[data-theme="glass"] .field input:not(:placeholder-shown) ~ .prefix, html[data-theme="glass"] .field input.kp-target ~ .prefix { color: #4da3ff; }
     /* glossy keycaps: lit top edge, a sheen over the upper half, a shaded lower edge, a small contact shadow */
-    html[data-theme="glass"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn) { background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.065) 47%, rgba(255,255,255,0.04) 53%, rgba(255,255,255,0.05) 100%), #0e0e10; border: 1px solid rgba(255,255,255,0.09); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -1px 0 rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.6); }
-    html[data-theme="glass"] .btn-clear, html[data-theme="glass"] .btn-kp { border-radius: 15px; }
-    html[data-theme="glass"] .kp-key { border-radius: 13px; font-size: 24px; font-weight: 400; }
-    html[data-theme="glass"] .kp-key.kp-fn { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 47%, rgba(255,255,255,0.015) 53%, rgba(255,255,255,0.02) 100%), #08080a; }
-    html[data-theme="glass"] .kp-key.pressed { background: linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.14)), #1a1a1d; border-color: rgba(255,255,255,0.16); }
+    /* controls: clear glass tiles. A faint white fill, a touch lighter at the top, and a hairline lit along the top edge */
+    html[data-theme="glass"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn) { background: linear-gradient(180deg, rgba(255,255,255,0.115), rgba(255,255,255,0.07)); border: 1px solid rgba(255,255,255,0.07); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 2px rgba(0,0,0,0.6); }
+    html[data-theme="glass"] .btn-clear, html[data-theme="glass"] .btn-kp { border-radius: 14px; }
+    html[data-theme="glass"] .kp-key { border-radius: 14px; font-size: 27px; font-weight: 400; }
+    html[data-theme="glass"] .kp-key.kp-fn { background: rgba(255,255,255,0.035); box-shadow: inset 0 1px 0 rgba(255,255,255,0.10); }
+    html[data-theme="glass"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn).pressed { background: rgba(255,255,255,0.26); border-color: rgba(255,255,255,0.14); transition-duration: 0s; }
     html[data-theme="glass"] .ripple { display: none; }
     /* Calculate: glossy blue */
-    html[data-theme="glass"] .btn { background: linear-gradient(180deg, #4ea6ff 0%, #1c88ff 47%, #0a7af2 53%, #0a6fe0 100%); border: 1px solid rgba(255,255,255,0.18); border-radius: 15px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,40,110,0.4), 0 8px 22px -10px rgba(10,132,255,0.75); }
+    html[data-theme="glass"] .btn { background: #0a84ff; border: none; border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), 0 8px 20px -10px rgba(10,132,255,0.8); }
+    html[data-theme="glass"] .btn.pressed { background: #0a74e0; transition-duration: 0s; }
     html[data-theme="glass"] .clear-menu, html[data-theme="glass"] .theme-menu { background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 60px), #141416; -webkit-backdrop-filter: none; backdrop-filter: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 18px 40px -12px rgba(0,0,0,0.9); }
     html[data-theme="glass"] .clear-menu button, html[data-theme="glass"] .theme-menu button { color: #fff; border-radius: 10px; }
     html[data-theme="glass"] .clear-menu .divider { background: rgba(255,255,255,0.1); }
@@ -235,9 +237,9 @@
     html[data-theme="glass"] .detail-box .dv { color: #fff; }
     html[data-theme="glass"] ::selection { background: rgba(10,132,255,0.45); }
     @media (hover: hover) {
-      html[data-theme="glass"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn):hover { background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.09) 47%, rgba(255,255,255,0.06) 53%, rgba(255,255,255,0.07) 100%), #121214; border-color: rgba(255,255,255,0.14); }
-      html[data-theme="glass"] .kp-key.pressed { background: linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.14)), #1a1a1d; }
-      html[data-theme="glass"] .btn:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 10px 28px -8px rgba(10,132,255,0.85); }
+      html[data-theme="glass"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn):hover { background: linear-gradient(180deg, rgba(255,255,255,0.155), rgba(255,255,255,0.095)); border-color: rgba(255,255,255,0.12); }
+      html[data-theme="glass"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn).pressed { background: rgba(255,255,255,0.26); }
+      html[data-theme="glass"] .btn:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), 0 10px 26px -8px rgba(10,132,255,0.9); }
       html[data-theme="glass"] .clear-menu button:hover, html[data-theme="glass"] .theme-menu button:hover { background: rgba(255,255,255,0.12); color: #fff; }
       html[data-theme="glass"] .clear-menu button.clear-all:hover { background: rgba(255,69,58,0.18); color: #ff6961; }
       html[data-theme="glass"] .cur-toggle:hover { border-color: rgba(255,255,255,0.14); }
@@ -275,9 +277,9 @@
     html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::after { transform: skewX(45deg) scaleY(0); }
     html[data-theme="minimal"] .btn { background: #0d0d0d; color: #fff; border: 1px solid #0d0d0d; --edge-r: #8a8a8a; --edge-b: #3d3d3d; margin-top: 10px; font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
     html[data-theme="minimal"] .btn.sweep::after { animation: none; }
-    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { background: rgba(255,255,255,0.82); color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
     html[data-theme="minimal"] .clear-wrap, html[data-theme="minimal"] .btn-kp { margin-top: 10px; }
-    html[data-theme="minimal"] .kp-key { background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-weight: 600; }
+    html[data-theme="minimal"] .kp-key { background: rgba(255,255,255,0.82); color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-weight: 600; }
     html[data-theme="minimal"] .kp-key.kp-fn { background: #0d0d0d; color: #fff; border-color: #0d0d0d; --edge-r: #8a8a8a; --edge-b: #3d3d3d; }
     html[data-theme="minimal"] .kp-key.pressed { background: #fff; border-color: #0d0d0d; }
     html[data-theme="minimal"] .field input { -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -299,7 +301,7 @@
     html[data-theme="minimal"] .cur-toggle span.on { color: #fff; }
     html[data-theme="minimal"] .error-msg { color: #d63a24; }
     html[data-theme="minimal"] .result { border-radius: 0; }
-    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: rgba(255,255,255,0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(13,13,13,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9); }
+    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: rgba(255,255,255,0.7); border: 1px solid rgba(13,13,13,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9); }
     html[data-theme="minimal"] .result.profit { border-top: 3px solid #06c270; }
     html[data-theme="minimal"] .result.loss { border-top: 3px solid #ee4d37; }
     html[data-theme="minimal"] .result.neutral { border-top: 3px solid #0d0d0d; }
@@ -497,7 +499,7 @@
         if(e.inputType==='deleteContentForward'&&v[s]===sep){e.preventDefault();splice(f,s,s+2,'');}
       });
       f.addEventListener('input',()=>reformat(f));
-      f.addEventListener('focus',()=>setTarget(f));
+      f.addEventListener('focus',()=>{setTarget(f);requestAnimationFrame(()=>revealKeypad(f));});
     });
     fields[0].value=clean(store.get(INV_KEY)||'');
 
@@ -528,8 +530,11 @@
       if(fields.includes(document.activeElement))document.activeElement.blur();  // next tap on a field opens it in the new mode
       setKeypad(!kpOn,true);  // kpOn, not keypad.hidden: hidden only flips when the fold animation ends
     });
+    let refocusing=false;
     const press=k=>{
-      const f=target,v=f.value,focused=document.activeElement===f;
+      const f=target;
+      if(kpOn&&document.activeElement!==f){refocusing=true;f.focus({preventScroll:true});refocusing=false;}  // keep the caret in the field being typed into
+      const v=f.value,focused=document.activeElement===f;
       let s=focused?f.selectionStart:v.length,end=focused?f.selectionEnd:v.length;
       if(k!=='back')return splice(f,s,end,k);
       if(s===end){if(!s)return;s--;if(v[s]===groupSep()&&s)s--;}  // backspace hops over a comma
@@ -538,11 +543,30 @@
     // ripple spreading from where the key was touched
     const ripple=(b,e)=>{const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2.2,s=document.createElement('span');s.className='ripple';s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;s.addEventListener('animationend',()=>s.remove());b.append(s);};
     keypad.querySelectorAll('.kp-key').forEach(b=>{
-      // mouse: keep focus + caret in the field. Not on touch: iPhone Safari then drops the tap's click.
-      b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')e.preventDefault();if(motionOK())ripple(b,e);b.classList.add('pressed');});
+      let down=null;
+      // never cancel a touch pointerdown: iPhone Safari would then drop the click, and with it the haptic
+      b.addEventListener('pointerdown',e=>{if(e.button)return;down=e.pointerId;if(e.pointerType==='mouse')e.preventDefault();if(motionOK())ripple(b,e);b.classList.add('pressed');});
+      // the key fires the moment the finger lifts, like a phone keyboard, instead of waiting for the browser's click
+      b.addEventListener('pointerup',e=>{
+        if(down!==e.pointerId)return;down=null;
+        const r=b.getBoundingClientRect();
+        if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){b._fired=performance.now();press(b.dataset.key);}
+      });
+      b.addEventListener('pointercancel',()=>{down=null;});  // the page scrolled instead: not a key press
+      b.addEventListener('click',()=>{if(performance.now()-(b._fired||-1e9)>700)press(b.dataset.key);});  // keyboard / VoiceOver: no pointer
+      b.addEventListener('mousedown',e=>e.preventDefault());  // a tap on a key must not pull focus (and the caret) out of the field
       ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,()=>b.classList.remove('pressed')));
-      b.addEventListener('click',()=>press(b.dataset.key));
     });
+    // keypad showing: tapping a field keeps its caret and scrolls just enough to bring the whole keypad into view
+    const revealKeypad=f=>{
+      if(!kpOn||refocusing)return;
+      const k=keypad.getBoundingClientRect(),top=f.getBoundingClientRect().top;
+      const dy=Math.min(k.bottom-innerHeight+12,top-12);  // never scroll the field itself off the top
+      if(dy<=4)return;
+      const goal=scrollY+dy;
+      scrollTo({top:goal,behavior:motionOK()?'smooth':'auto'});
+      setTimeout(()=>{if(Math.abs(scrollY-goal)>4&&document.activeElement===f)scrollTo({top:goal});},600);  // the browser's own focus scroll can cut a smooth scroll short
+    };
     setKeypad(store.get(KP_KEY)!=='1',false);
 
     // Currency toggle (top right of the title): steps to the next currency and regroups everything shown.
