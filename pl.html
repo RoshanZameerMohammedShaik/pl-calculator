@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Stock P&L">
-  <meta name="theme-color" content="#0f0c29">
+  <meta name="theme-color" content="#05040d">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23302b63' width='100' height='100' rx='20'/><text y='70' x='15' font-size='60'>📈</text></svg>">
   <script>try{var t=localStorage.getItem('plCalc.theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <style>
@@ -15,7 +15,7 @@
     :root { color-scheme: dark; --flash: rgba(167,139,250,0.25); --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); --ease-std: cubic-bezier(0.4, 0, 0.2, 1); }
     button, input { font-family: inherit; }
     ::selection { background: rgba(167,139,250,0.35); }
-    html { background: #0f0c29; }
+    html { background: #05040d; }
     body {
       min-height: 100vh;
       display: flex;
@@ -24,8 +24,8 @@
       align-items: center;
       justify-content: center;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: #e0e0e0;
+      background: linear-gradient(135deg, #05040d 0%, #100d2b 48%, #080714 100%);
+      color: #e3e5e9;
       -webkit-font-smoothing: antialiased;
       overflow-y: auto;
       padding: 20px 0;
@@ -36,15 +36,15 @@
     .bg-particles span { position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: float linear infinite; }
     /* soft colored light behind the glass: tints green or red with the result, then holds still */
     .aurora, .aurora::before, .aurora::after { position: fixed; inset: 0; pointer-events: none; }
-    .aurora { z-index: 0; background: radial-gradient(55% 40% at 15% 8%, rgba(124,58,237,0.22), transparent 70%), radial-gradient(50% 40% at 90% 92%, rgba(59,130,246,0.16), transparent 70%); }
+    .aurora { z-index: 0; background: radial-gradient(42% 30% at 14% 6%, rgba(139,92,246,0.42), rgba(124,58,237,0.1) 52%, transparent 74%), radial-gradient(38% 30% at 92% 94%, rgba(59,130,246,0.32), transparent 72%), radial-gradient(30% 24% at 82% 30%, rgba(167,139,250,0.14), transparent 70%); }
     .aurora::before, .aurora::after { content: ''; opacity: 0; transition: opacity 1.2s var(--ease-std); }
     .aurora::before { background: radial-gradient(60% 45% at 50% 50%, rgba(16,185,129,0.24), transparent 70%); }
     .aurora::after { background: radial-gradient(60% 45% at 50% 50%, rgba(239,68,68,0.22), transparent 70%); }
     body.mood-profit .aurora::before, body.mood-loss .aurora::after { opacity: 1; }
     @keyframes float { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
-    .card { position: relative; z-index: 1; background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 28px 24px; width: 380px; max-width: calc(100vw - 20px); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07); transition: transform 0.3s ease; }
+    .card { position: relative; z-index: 1; background: linear-gradient(160deg, rgba(255,255,255,0.075), rgba(255,255,255,0.028) 42%, rgba(255,255,255,0.045)); -webkit-backdrop-filter: blur(30px) saturate(165%); backdrop-filter: blur(30px) saturate(165%); border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; padding: 28px 28px 24px; width: 380px; max-width: calc(100vw - 20px); box-shadow: 0 24px 56px -20px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(255,255,255,0.05); transition: transform 0.3s ease; }
     /* lit edge: a hairline gradient border on the main card */
-    .card:not(.keypad)::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgba(167,139,250,0.55), rgba(96,165,250,0.08) 35%, transparent 60%, rgba(96,165,250,0.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+    .card::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(148deg, rgba(196,181,253,0.8), rgba(167,139,250,0.2) 20%, rgba(96,165,250,0.05) 46%, transparent 64%, rgba(96,165,250,0.34)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
     .logo { text-align: center; margin-bottom: 18px; }
     .logo-mark { width: 36px; height: 36px; margin-bottom: 4px; }
     .logo h1 { font-size: 18px; font-weight: 700; background: linear-gradient(90deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -53,7 +53,7 @@
     .field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #9ca3af; margin-bottom: 4px; }
     .field .input-wrap { position: relative; display: flex; align-items: center; }
     .field .prefix { position: absolute; left: 12px; font-size: 14px; color: #6b7280; pointer-events: none; transition: color 0.2s; }
-    .field input { width: 100%; padding: 10px 12px 10px 28px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f3f4f6; font-size: 14px; font-variant-numeric: tabular-nums; caret-color: #a78bfa; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .field input { width: 100%; padding: 10px 12px 10px 28px; background: rgba(0,0,0,0.26); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f3f4f6; font-size: 14px; font-variant-numeric: tabular-nums; caret-color: #a78bfa; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .field input:focus, .field input.kp-target { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.15); }
     .field input:focus ~ .prefix, .field input:not(:placeholder-shown) ~ .prefix, .field input.kp-target ~ .prefix { color: #a78bfa; }
     .field input::placeholder { color: #4b5563; }
@@ -67,7 +67,7 @@
     .btn-clear[aria-expanded="true"] .chevron { transform: rotate(180deg); }
     .clear-menu { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: rgba(30,27,55,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 5; visibility: hidden; transform: translateY(-6px) scale(0.98); transform-origin: top center; transition: transform 0.18s var(--ease-out), visibility 0s 0.18s; }
     .clear-menu.open { visibility: visible; transform: none; transition: transform 0.18s var(--ease-out), visibility 0s; }
-    .clear-menu button { width: 100%; text-align: left; padding: 9px 12px; background: transparent; border: none; border-radius: 8px; color: #e0e0e0; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .clear-menu button { width: 100%; text-align: left; padding: 9px 12px; background: transparent; border: none; border-radius: 8px; color: #e3e5e9; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; }
     .clear-menu button.hot { background: rgba(167,139,250,0.18); color: #fff; }
     .clear-menu button { user-select: none; -webkit-user-select: none; }
     .clear-menu .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 5px 6px; }
@@ -78,8 +78,15 @@
     .btn-kp svg { width: 15px; height: 15px; opacity: 0.85; }
     .keypad { z-index: 0; padding: 14px; }  /* below the main card so the Clear Fields menu can overlap it */
     .keypad[hidden] { display: none; }
+    /* typing: the keypad pins to the bottom edge so it's always fully reachable, whatever the screen height.
+       A spacer keeps the same amount of scrollable room, so nothing below it jumps. */
+    /* centre without transform: the card carries a 0.3s transform transition, so translateX would make the keypad
+       slide sideways into place and a key tapped mid-slide would register as its neighbour */
+    body.typing .keypad { position: fixed; left: 0; right: 0; margin-left: auto; margin-right: auto; bottom: max(10px, env(safe-area-inset-bottom)); z-index: 8; transition: none; }
+    .kp-space { display: none; }
+    body.typing .kp-space { display: block; flex: 0 0 auto; }
     .kp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .kp-key { height: 52px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.06); color: #f3f4f6; font-family: inherit; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 0.12s, border-color 0.12s, transform 0.08s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.25); }
+    .kp-key { height: 52px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); color: #f3f4f6; font-family: inherit; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 0.12s, border-color 0.12s, transform 0.08s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.25); }
     .ripple { position: absolute; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(196,181,253,0.45) 0%, rgba(196,181,253,0) 65%); transform: scale(0); animation: ripple 0.55s var(--ease-out) forwards; }
     @keyframes ripple { to { transform: scale(1); opacity: 0; } }
     .kp-key.kp-fn { color: #c4b5fd; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.18); }
@@ -97,7 +104,7 @@
     .theme-btn svg { width: 16px; height: 16px; }
     .theme-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 196px; text-align: left; background: rgba(30,27,55,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 6; visibility: hidden; transform: translateY(-6px) scale(0.98); transform-origin: top left; transition: transform 0.18s var(--ease-out), visibility 0s 0.18s; }
     .theme-menu.open { visibility: visible; transform: none; transition: transform 0.18s var(--ease-out), visibility 0s; }
-    .theme-menu button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: transparent; border: none; border-radius: 8px; color: #e0e0e0; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; user-select: none; -webkit-user-select: none; transition: background 0.15s, color 0.15s; }
+    .theme-menu button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: transparent; border: none; border-radius: 8px; color: #e3e5e9; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; user-select: none; -webkit-user-select: none; transition: background 0.15s, color 0.15s; }
     .theme-menu .swatch { width: 18px; height: 18px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); box-shadow: 0 0 0 1px rgba(255,255,255,0.25); }
     .theme-menu .check { width: 16px; height: 16px; margin-left: auto; opacity: 0; color: #a78bfa; }
     .theme-menu [aria-checked="true"] .check { opacity: 1; }
@@ -187,7 +194,7 @@
       -webkit-backdrop-filter: none; backdrop-filter: none; border: 1px solid rgba(255,255,255,0.07); border-radius: 28px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.36), inset 0 -1px 0 rgba(255,255,255,0.05), 0 1px 0 rgba(255,255,255,0.03), 0 28px 56px -24px rgba(0,0,0,0.95); }
     /* bevel: catches the light at the top left, a faint bounce at the bottom right */
-    html[data-theme="glass"] .card:not(.keypad)::before, html[data-theme="glass"] .keypad::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(152deg, rgba(255,255,255,0.78), rgba(255,255,255,0.18) 18%, rgba(255,255,255,0.05) 42%, rgba(255,255,255,0.03) 72%, rgba(255,255,255,0.16)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; display: block; }
+    html[data-theme="glass"] .card::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(152deg, rgba(255,255,255,0.78), rgba(255,255,255,0.18) 18%, rgba(255,255,255,0.05) 42%, rgba(255,255,255,0.03) 72%, rgba(255,255,255,0.16)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; display: block; }
     html[data-theme="glass"] .card::after { display: none; }
     html[data-theme="glass"] .logo h1 { background: none; -webkit-text-fill-color: #fff; color: #fff; letter-spacing: -0.2px; }
     html[data-theme="glass"] .logo p, html[data-theme="glass"] .field label { color: rgba(235,235,245,0.62); }
@@ -246,27 +253,27 @@
     }
 
     /* ===== Theme: Minimal White (after CRED's NeoPOP: black on white, sharp corners, 3D buttons that plunk) ===== */
-    html[data-theme="minimal"] { background: #f0f0ee; color-scheme: light; --flash: rgba(20,76,199,0.14); }
-    html[data-theme="minimal"] body { background: #f0f0ee; color: #0d0d0d; }
-    html[data-theme="minimal"] body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: #0d0d0d; z-index: 20; pointer-events: none; }  /* home-screen app: keeps the white status-bar text readable */
+    html[data-theme="minimal"] { background: #f2f3f5; color-scheme: light; --flash: rgba(20,76,199,0.14); }
+    html[data-theme="minimal"] body { background: #f2f3f5; color: #101114; }
+    html[data-theme="minimal"] body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: #101114; z-index: 20; pointer-events: none; }  /* home-screen app: keeps the white status-bar text readable */
     html[data-theme="minimal"] .bg-particles { display: none; }
     html[data-theme="minimal"] .aurora { background:
-      linear-gradient(108deg, transparent 30%, rgba(13,13,13,0.09) 38%, rgba(13,13,13,0.15) 43%, rgba(13,13,13,0.07) 50%, transparent 59%),
-      radial-gradient(38% 32% at 16% 12%, rgba(13,13,13,0.14), transparent 72%),
-      radial-gradient(36% 30% at 88% 74%, rgba(13,13,13,0.12), transparent 72%); }
+      linear-gradient(108deg, transparent 30%, rgba(16,18,24,0.07) 38%, rgba(16,18,24,0.12) 43%, rgba(16,18,24,0.055) 50%, transparent 59%),
+      radial-gradient(38% 32% at 16% 12%, rgba(16,18,24,0.11), transparent 72%),
+      radial-gradient(36% 30% at 88% 74%, rgba(16,18,24,0.1), transparent 72%); }
     html[data-theme="minimal"] .aurora::before, html[data-theme="minimal"] .aurora::after { display: none; }
-    html[data-theme="minimal"] .card { background: rgba(255,255,255,0.62); -webkit-backdrop-filter: blur(24px) saturate(120%); backdrop-filter: blur(24px) saturate(120%); border: 1px solid rgba(13,13,13,0.12); border-radius: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.9); }
-    html[data-theme="minimal"] .card:not(.keypad)::before { display: none; }
-    html[data-theme="minimal"] .logo-mark rect, html[data-theme="minimal"] .logo-mark circle { fill: #0d0d0d; }
-    html[data-theme="minimal"] .logo-mark path { stroke: #0d0d0d; }
-    html[data-theme="minimal"] .logo h1 { background: none; -webkit-text-fill-color: #0d0d0d; color: #0d0d0d; font-family: ui-serif, 'New York', Georgia, 'Times New Roman', serif; font-size: 18px; letter-spacing: -0.2px; }
-    html[data-theme="minimal"] .logo p { color: rgba(13,13,13,0.66); }
-    html[data-theme="minimal"] .field label { color: rgba(13,13,13,0.7); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
-    html[data-theme="minimal"] .field input { background: transparent; border: none; border-bottom: 1.5px solid #0d0d0d; border-radius: 0; padding-left: 18px; color: #0d0d0d; font-size: 16px; font-weight: 600; caret-color: #144cc7; }
-    html[data-theme="minimal"] .field input::placeholder { color: rgba(13,13,13,0.25); }
+    html[data-theme="minimal"] .card { background: rgba(255,255,255,0.7); -webkit-backdrop-filter: blur(24px) saturate(115%); backdrop-filter: blur(24px) saturate(115%); border: 1px solid rgba(16,18,24,0.1); border-radius: 0; box-shadow: inset 0 1px 0 #fff; }
+    html[data-theme="minimal"] .card::before { display: none; }
+    html[data-theme="minimal"] .logo-mark rect, html[data-theme="minimal"] .logo-mark circle { fill: #101114; }
+    html[data-theme="minimal"] .logo-mark path { stroke: #101114; }
+    html[data-theme="minimal"] .logo h1 { background: none; -webkit-text-fill-color: #101114; color: #101114; font-family: ui-serif, 'New York', Georgia, 'Times New Roman', serif; font-size: 18px; letter-spacing: -0.2px; }
+    html[data-theme="minimal"] .logo p { color: rgba(16,18,24,0.62); }
+    html[data-theme="minimal"] .field label { color: rgba(16,18,24,0.66); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+    html[data-theme="minimal"] .field input { background: transparent; border: none; border-bottom: 1.5px solid #101114; border-radius: 0; padding-left: 18px; color: #101114; font-size: 16px; font-weight: 600; caret-color: #144cc7; }
+    html[data-theme="minimal"] .field input::placeholder { color: rgba(16,18,24,0.26); }
     html[data-theme="minimal"] .field input:focus, html[data-theme="minimal"] .field input.kp-target { border-color: #144cc7; box-shadow: 0 1.5px 0 #144cc7; }
-    html[data-theme="minimal"] .field .prefix { left: 0; font-size: 16px; font-weight: 600; color: rgba(13,13,13,0.35); }
-    html[data-theme="minimal"] .field input:focus ~ .prefix, html[data-theme="minimal"] .field input:not(:placeholder-shown) ~ .prefix, html[data-theme="minimal"] .field input.kp-target ~ .prefix { color: #0d0d0d; }
+    html[data-theme="minimal"] .field .prefix { left: 0; font-size: 16px; font-weight: 600; color: rgba(16,18,24,0.36); }
+    html[data-theme="minimal"] .field input:focus ~ .prefix, html[data-theme="minimal"] .field input:not(:placeholder-shown) ~ .prefix, html[data-theme="minimal"] .field input.kp-target ~ .prefix { color: #101114; }
     /* NeoPOP buttons: a flat face plus a 3px right edge and bottom edge slanted at 45deg; pressing plunks the face into them */
     html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key) { border-radius: 0; overflow: visible; box-shadow: none; transition: transform 0.12s ease-in-out; }
     html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::before, html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::after { content: ''; position: absolute; pointer-events: none; transform-origin: 0 0; transition: transform 0.12s ease-in-out; }
@@ -275,58 +282,58 @@
     html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active) { transform: translate(3px, 3px); }
     html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::before { transform: skewY(45deg) scaleX(0); }
     html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::after { transform: skewX(45deg) scaleY(0); }
-    html[data-theme="minimal"] .btn { background: #0d0d0d; color: #fff; border: 1px solid #0d0d0d; --edge-r: #8a8a8a; --edge-b: #3d3d3d; margin-top: 10px; font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
+    html[data-theme="minimal"] .btn { background: #101114; color: #fff; border: 1px solid #101114; --edge-r: #8d9099; --edge-b: #3f4248; margin-top: 10px; font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
     html[data-theme="minimal"] .btn.sweep::after { animation: none; }
-    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { background: rgba(255,255,255,0.82); color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { background: rgba(255,255,255,0.86); color: #101114; border: 1px solid #101114; --edge-r: #e3e5e9; --edge-b: #8d9099; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
     html[data-theme="minimal"] .clear-wrap, html[data-theme="minimal"] .btn-kp { margin-top: 10px; }
-    html[data-theme="minimal"] .kp-key { background: rgba(255,255,255,0.82); color: #0d0d0d; border: 1px solid #0d0d0d; --edge-r: #e0e0e0; --edge-b: #8a8a8a; font-weight: 600; }
-    html[data-theme="minimal"] .kp-key.kp-fn { background: #0d0d0d; color: #fff; border-color: #0d0d0d; --edge-r: #8a8a8a; --edge-b: #3d3d3d; }
-    html[data-theme="minimal"] .kp-key.pressed { background: #fff; border-color: #0d0d0d; }
+    html[data-theme="minimal"] .kp-key { background: rgba(255,255,255,0.86); color: #101114; border: 1px solid #101114; --edge-r: #e3e5e9; --edge-b: #8d9099; font-weight: 600; }
+    html[data-theme="minimal"] .kp-key.kp-fn { background: #101114; color: #fff; border-color: #101114; --edge-r: #8d9099; --edge-b: #3f4248; }
+    html[data-theme="minimal"] .kp-key.pressed { background: #fff; border-color: #101114; }
     html[data-theme="minimal"] .field input { -webkit-backdrop-filter: none; backdrop-filter: none; }
-    html[data-theme="minimal"] .kp-key.kp-fn.pressed { background: #0d0d0d; }
+    html[data-theme="minimal"] .kp-key.kp-fn.pressed { background: #101114; }
     html[data-theme="minimal"] .ripple { display: none; }
     html[data-theme="minimal"] .kp-grid { gap: 10px; }
-    html[data-theme="minimal"] .clear-menu, html[data-theme="minimal"] .theme-menu { background: rgba(255,255,255,0.9); -webkit-backdrop-filter: blur(20px) saturate(118%); backdrop-filter: blur(20px) saturate(118%); border: 1px solid #0d0d0d; border-radius: 0; box-shadow: 4px 4px 0 #0d0d0d; }
-    html[data-theme="minimal"] .clear-menu button, html[data-theme="minimal"] .theme-menu button { color: #0d0d0d; border-radius: 0; }
-    html[data-theme="minimal"] .clear-menu .divider { background: #e0e0e0; }
-    html[data-theme="minimal"] .clear-menu button.hot { background: #f0f0ee; color: #0d0d0d; }
+    html[data-theme="minimal"] .clear-menu, html[data-theme="minimal"] .theme-menu { background: rgba(255,255,255,0.94); -webkit-backdrop-filter: blur(20px) saturate(118%); backdrop-filter: blur(20px) saturate(118%); border: 1px solid #101114; border-radius: 0; box-shadow: 4px 4px 0 #101114; }
+    html[data-theme="minimal"] .clear-menu button, html[data-theme="minimal"] .theme-menu button { color: #101114; border-radius: 0; }
+    html[data-theme="minimal"] .clear-menu .divider { background: #e3e5e9; }
+    html[data-theme="minimal"] .clear-menu button.hot { background: #eef0f3; color: #101114; }
     html[data-theme="minimal"] .clear-menu button.clear-all { color: #d63a24; }
-    html[data-theme="minimal"] .clear-menu button.clear-all.hot { background: #fdeceb; color: #d63a24; }
-    html[data-theme="minimal"] .theme-menu .swatch { border-radius: 0; box-shadow: 0 0 0 1px #0d0d0d; }
-    html[data-theme="minimal"] .theme-menu .check { color: #0d0d0d; }
-    html[data-theme="minimal"] .theme-btn { border-radius: 0; border-color: #0d0d0d; background: rgba(255,255,255,0.78); color: #0d0d0d; }
-    html[data-theme="minimal"] .cur-toggle { background: rgba(255,255,255,0.78); border-color: #0d0d0d; border-radius: 0; }
-    html[data-theme="minimal"] .cur-toggle::before { background: #0d0d0d; border-radius: 0; box-shadow: none; }
+    html[data-theme="minimal"] .clear-menu button.clear-all.hot { background: #fdecea; color: #d63a24; }
+    html[data-theme="minimal"] .theme-menu .swatch { border-radius: 0; box-shadow: 0 0 0 1px #101114; }
+    html[data-theme="minimal"] .theme-menu .check { color: #101114; }
+    html[data-theme="minimal"] .theme-btn { border-radius: 0; border-color: #101114; background: rgba(255,255,255,0.78); color: #101114; }
+    html[data-theme="minimal"] .cur-toggle { background: rgba(255,255,255,0.78); border-color: #101114; border-radius: 0; }
+    html[data-theme="minimal"] .cur-toggle::before { background: #101114; border-radius: 0; box-shadow: none; }
     html[data-theme="minimal"] .cur-toggle span { border-radius: 0; color: rgba(13,13,13,0.5); }
     html[data-theme="minimal"] .cur-toggle span.on { color: #fff; }
     html[data-theme="minimal"] .error-msg { color: #d63a24; }
     html[data-theme="minimal"] .result { border-radius: 0; }
-    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: rgba(255,255,255,0.7); border: 1px solid rgba(13,13,13,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9); }
+    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: rgba(255,255,255,0.7); border: 1px solid rgba(16,18,24,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9); }
     html[data-theme="minimal"] .result.profit { border-top: 3px solid #06c270; }
     html[data-theme="minimal"] .result.loss { border-top: 3px solid #ee4d37; }
-    html[data-theme="minimal"] .result.neutral { border-top: 3px solid #0d0d0d; }
+    html[data-theme="minimal"] .result.neutral { border-top: 3px solid #101114; }
     html[data-theme="minimal"] .profit .result-label, html[data-theme="minimal"] .profit .result-pct { color: #1e8057; }
     html[data-theme="minimal"] .loss .result-label, html[data-theme="minimal"] .loss .result-pct { color: #d63a24; }
     html[data-theme="minimal"] .profit .result-amount { background: none; color: #1e8057; -webkit-text-fill-color: #1e8057; }
     html[data-theme="minimal"] .loss .result-amount { background: none; color: #d63a24; -webkit-text-fill-color: #d63a24; }
-    html[data-theme="minimal"] .neutral .result-amount, html[data-theme="minimal"] .neutral .result-label, html[data-theme="minimal"] .neutral .result-pct { color: #0d0d0d; }
+    html[data-theme="minimal"] .neutral .result-amount, html[data-theme="minimal"] .neutral .result-label, html[data-theme="minimal"] .neutral .result-pct { color: #101114; }
     html[data-theme="minimal"] .result-icon { border-radius: 0; }
     html[data-theme="minimal"] .profit .result-icon { background: rgba(6,194,112,0.12); color: #06c270; }
     html[data-theme="minimal"] .loss .result-icon { background: rgba(238,77,55,0.12); color: #ee4d37; }
-    html[data-theme="minimal"] .neutral .result-icon { background: #f0f0ee; color: #0d0d0d; }
-    html[data-theme="minimal"] .detail-box { background: rgba(13,13,13,0.04); border-radius: 0; }
-    html[data-theme="minimal"] .detail-box .dl { color: rgba(13,13,13,0.66); }
-    html[data-theme="minimal"] .detail-box .dv { color: #0d0d0d; }
+    html[data-theme="minimal"] .neutral .result-icon { background: #eef0f3; color: #101114; }
+    html[data-theme="minimal"] .detail-box { background: rgba(16,18,24,0.045); border-radius: 0; }
+    html[data-theme="minimal"] .detail-box .dl { color: rgba(16,18,24,0.62); }
+    html[data-theme="minimal"] .detail-box .dv { color: #101114; }
     html[data-theme="minimal"] ::selection { background: rgba(20,76,199,0.2); }
     @media (hover: hover) {
       html[data-theme="minimal"] .card:not(.keypad):hover { transform: none; }
       html[data-theme="minimal"] .btn:hover { transform: none; box-shadow: none; }
       html[data-theme="minimal"] .btn:hover::after { transform: skewX(45deg); }
-      html[data-theme="minimal"] .btn-clear:hover, html[data-theme="minimal"] .btn-kp:hover, html[data-theme="minimal"] .kp-key:hover, html[data-theme="minimal"] .theme-btn:hover { background: #f7f7f5; border-color: #0d0d0d; }
-      html[data-theme="minimal"] .kp-key.kp-fn:hover { background: #262626; }
-      html[data-theme="minimal"] .clear-menu button:hover, html[data-theme="minimal"] .theme-menu button:hover { background: #f0f0ee; color: #0d0d0d; }
-      html[data-theme="minimal"] .clear-menu button.clear-all:hover { background: #fdeceb; color: #d63a24; }
-      html[data-theme="minimal"] .cur-toggle:hover { border-color: #0d0d0d; }
+      html[data-theme="minimal"] .btn-clear:hover, html[data-theme="minimal"] .btn-kp:hover, html[data-theme="minimal"] .kp-key:hover, html[data-theme="minimal"] .theme-btn:hover { background: #f7f8fa; border-color: #101114; }
+      html[data-theme="minimal"] .kp-key.kp-fn:hover { background: #282a2e; }
+      html[data-theme="minimal"] .clear-menu button:hover, html[data-theme="minimal"] .theme-menu button:hover { background: #eef0f3; color: #101114; }
+      html[data-theme="minimal"] .clear-menu button.clear-all:hover { background: #fdecea; color: #d63a24; }
+      html[data-theme="minimal"] .cur-toggle:hover { border-color: #101114; }
       html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active) { transform: translate(3px, 3px); }
     }
     @media (max-width: 360px) { html[data-theme="minimal"] .logo h1 { font-size: 16px; } }
@@ -386,6 +393,7 @@
       <button type="button" class="kp-key kp-fn" data-key="back" tabindex="-1" aria-label="Backspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button>
     </div>
   </div>
+  <div class="kp-space" id="kpSpace" aria-hidden="true"></div>
   <div class="theme-veil" id="themeVeil" aria-hidden="true"></div>
   <script>
     (()=>{const c=document.getElementById('particles');for(let i=0;i<30;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.animationDuration=(6+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';s.style.width=s.style.height=(2+Math.random()*4)+'px';c.appendChild(s);}})();
@@ -393,9 +401,9 @@
     // Themes: chosen from the round button left of the title. <head> applies the saved one before first paint.
     const THEME_KEY='plCalc.theme';
     const THEMES=[
-      {id:'midnight',name:'Midnight',meta:'#0f0c29',swatch:['#302b63','#a78bfa']},
+      {id:'midnight',name:'Midnight',meta:'#05040d',swatch:['#100d2b','#a78bfa']},
       {id:'glass',name:'Black Glass',meta:'#000000',swatch:['#000000','#0a84ff']},
-      {id:'minimal',name:'Minimal White',meta:'#f0f0ee',swatch:['#ffffff','#0d0d0d']},
+      {id:'minimal',name:'Minimal White',meta:'#f2f3f5',swatch:['#ffffff','#101114']},
     ];
     const themeBtn=$('themeBtn'),themeMenu=$('themeMenu');
     THEMES.forEach(t=>{const b=document.createElement('button');b.type='button';b.dataset.themeId=t.id;b.setAttribute('role','menuitemradio');b.innerHTML=`<span class="swatch" style="--a:${t.swatch[0]};--b:${t.swatch[1]}"></span><span>${t.name}</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;themeMenu.append(b);});
@@ -452,7 +460,8 @@
       veilAnim.onfinish=()=>{go();veilAnim=veil.animate([{opacity:0.92},{opacity:0}],{duration:300,easing:'ease-out'});};
     };
     const closeThemeMenu=()=>{themeMenu.classList.remove('open');themeBtn.setAttribute('aria-expanded','false');};
-    themeBtn.addEventListener('click',()=>{const open=!themeMenu.classList.contains('open');themeMenu.classList.toggle('open',open);themeBtn.setAttribute('aria-expanded',open);});
+    themeBtn.addEventListener('click',()=>{
+      if(fields.includes(document.activeElement))document.activeElement.blur();const open=!themeMenu.classList.contains('open');themeMenu.classList.toggle('open',open);themeBtn.setAttribute('aria-expanded',open);});
     themeMenu.addEventListener('click',e=>{const b=e.target.closest('[data-theme-id]');if(!b)return;applyTheme(b.dataset.themeId,true);closeThemeMenu();});
     document.addEventListener('click',e=>{if(!e.target.closest('.theme-wrap'))closeThemeMenu();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeThemeMenu();});
@@ -500,6 +509,7 @@
       });
       f.addEventListener('input',()=>reformat(f));
       f.addEventListener('focus',()=>{setTarget(f);requestAnimationFrame(()=>revealKeypad(f));});
+      f.addEventListener('blur',()=>{setTimeout(()=>{if(!fields.includes(document.activeElement))unpin();},60);});
     });
     fields[0].value=clean(store.get(INV_KEY)||'');
 
@@ -527,6 +537,7 @@
       kpAnim.onfinish=done;
     };
     kpToggle.addEventListener('click',()=>{
+      unpin();
       if(fields.includes(document.activeElement))document.activeElement.blur();  // next tap on a field opens it in the new mode
       setKeypad(!kpOn,true);  // kpOn, not keypad.hidden: hidden only flips when the fold animation ends
     });
@@ -557,16 +568,35 @@
       b.addEventListener('mousedown',e=>e.preventDefault());  // a tap on a key must not pull focus (and the caret) out of the field
       ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,()=>b.classList.remove('pressed')));
     });
-    // keypad showing: tapping a field keeps its caret and scrolls just enough to bring the whole keypad into view
-    const revealKeypad=f=>{
-      if(!kpOn||refocusing)return;
-      const k=keypad.getBoundingClientRect(),top=f.getBoundingClientRect().top;
-      const dy=Math.min(k.bottom-innerHeight+12,top-12);  // never scroll the field itself off the top
-      if(dy<=4)return;
-      const goal=scrollY+dy;
-      scrollTo({top:goal,behavior:motionOK()?'smooth':'auto'});
-      setTimeout(()=>{if(Math.abs(scrollY-goal)>4&&document.activeElement===f)scrollTo({top:goal});},600);  // the browser's own focus scroll can cut a smooth scroll short
+    // Typing with the keypad on: pin the keypad to the bottom of the screen (like the phone's own keyboard) and
+    // scroll the field just above it. Scrolling alone can't work on a short screen -- the field and the whole keypad
+    // don't both fit once a result is on screen -- so the keypad is lifted out of the flow instead.
+    const kpSpace=$('kpSpace');
+    let revealTimer=null,revealWatch=null;
+    const unpin=()=>{clearTimeout(revealTimer);clearInterval(revealWatch);document.body.classList.remove('typing');kpSpace.style.height='';};
+    const pin=f=>{
+      if(!kpOn||keypad.hidden)return;
+      const h=Math.round(keypad.getBoundingClientRect().height);
+      kpSpace.style.height=h+'px';  // same scrollable room as the keypad took in the flow
+      document.body.classList.add('typing');
+      const settle=()=>{
+        if(!document.body.classList.contains('typing')||document.activeElement!==f)return;
+        const k=keypad.getBoundingClientRect(),r=f.getBoundingClientRect();
+        const dy=r.bottom-(k.top-10);          // slide the field up only if the keypad covers it
+        if(dy<=4)return;
+        const goal=Math.max(0,scrollY+dy);
+        scrollTo({top:goal,behavior:motionOK()?'smooth':'auto'});
+        revealTimer=setTimeout(()=>{if(Math.abs(scrollY-goal)>4&&document.activeElement===f)scrollTo({top:goal});},600);
+      };
+      // the browser does its own scroll to show the focused field: wait for the page to stop moving, then place it
+      clearTimeout(revealTimer);clearInterval(revealWatch);
+      let last=NaN,still=0,ticks=0;
+      revealWatch=setInterval(()=>{
+        if(scrollY===last)still++;else{still=0;last=scrollY;}
+        if(still>=2||++ticks>24){clearInterval(revealWatch);settle();}
+      },50);
     };
+    const revealKeypad=f=>{if(!refocusing)pin(f);};
     setKeypad(store.get(KP_KEY)!=='1',false);
 
     // Currency toggle (top right of the title): steps to the next currency and regroups everything shown.
@@ -609,6 +639,7 @@
 
     let holdDragged=false, pressing=false;
     clearBtn.addEventListener('pointerdown',e=>{
+      if(fields.includes(document.activeElement))document.activeElement.blur();  // a menu over a pinned keypad would be unreachable
       if(e.pointerType==='mouse')e.preventDefault();  // mouse: no text selection. Touch: CSS covers that, and a canceled touch loses its click (and the iPhone haptic)
       pressing=true; holdDragged=false;
       openMenu();
