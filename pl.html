@@ -33,7 +33,7 @@
       padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
     .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-    .bg-particles span { position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: float linear infinite; }
+    .bg-particles span { position: absolute; width: 4px; height: 4px; background: var(--bubble, rgba(255,255,255,0.34)); border-radius: 50%; animation: float linear infinite; }
     /* soft colored light behind the glass: tints green or red with the result, then holds still */
     .aurora, .aurora::before, .aurora::after { position: fixed; inset: 0; pointer-events: none; }
     .aurora { z-index: 0; background: radial-gradient(42% 30% at 14% 6%, rgba(139,92,246,0.42), rgba(124,58,237,0.1) 52%, transparent 74%), radial-gradient(38% 30% at 92% 94%, rgba(59,130,246,0.32), transparent 72%), radial-gradient(30% 24% at 82% 30%, rgba(167,139,250,0.14), transparent 70%); }
@@ -181,9 +181,8 @@
        Clear, glossy, natural: a pure black room, panels of smoked clear glass, one light source at the top left.
        The glass is defined by how it catches that light (a crisp top edge, a soft reflection falling off naturally,
        glossy keycaps), not by shapes or glows behind it. */
-    html[data-theme="glass"] { background: #000; --flash: rgba(10,132,255,0.35); }
+    html[data-theme="glass"] { background: #000; --flash: rgba(10,132,255,0.35); --bubble: rgba(255,255,255,0.3); }
     html[data-theme="glass"] body { background: #000; color: #fff; font-family: -apple-system, system-ui, 'Segoe UI', sans-serif; }
-    html[data-theme="glass"] .bg-particles { display: none; }
     html[data-theme="glass"] .aurora { background: #000; }
     html[data-theme="glass"] .aurora::before, html[data-theme="glass"] .aurora::after { display: none; }
     /* the slab: light pools under the top edge and fades within ~120px; a soft reflection from the top-left corner */
@@ -253,10 +252,9 @@
     }
 
     /* ===== Theme: Minimal White (after CRED's NeoPOP: black on white, sharp corners, 3D buttons that plunk) ===== */
-    html[data-theme="minimal"] { background: #f2f3f5; color-scheme: light; --flash: rgba(20,76,199,0.14); }
+    html[data-theme="minimal"] { background: #f2f3f5; color-scheme: light; --flash: rgba(20,76,199,0.14); --bubble: rgba(16,18,24,0.34); }
     html[data-theme="minimal"] body { background: #f2f3f5; color: #101114; }
     html[data-theme="minimal"] body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: #101114; z-index: 20; pointer-events: none; }  /* home-screen app: keeps the white status-bar text readable */
-    html[data-theme="minimal"] .bg-particles { display: none; }
     html[data-theme="minimal"] .aurora { background:
       linear-gradient(108deg, transparent 30%, rgba(16,18,24,0.07) 38%, rgba(16,18,24,0.12) 43%, rgba(16,18,24,0.055) 50%, transparent 59%),
       radial-gradient(38% 32% at 16% 12%, rgba(16,18,24,0.11), transparent 72%),
@@ -396,7 +394,7 @@
   <div class="kp-space" id="kpSpace" aria-hidden="true"></div>
   <div class="theme-veil" id="themeVeil" aria-hidden="true"></div>
   <script>
-    (()=>{const c=document.getElementById('particles');for(let i=0;i<30;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.animationDuration=(6+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';s.style.width=s.style.height=(2+Math.random()*4)+'px';c.appendChild(s);}})();
+    (()=>{const c=document.getElementById('particles');for(let i=0;i<70;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';const dur=6+Math.random()*10;s.style.animationDuration=dur+'s';s.style.animationDelay=-Math.random()*dur+'s';/* negative delay: already mid-rise at load, so there is no empty wait */s.style.width=s.style.height=(3+Math.random()*5)+'px';c.appendChild(s);}})();
     const $=id=>document.getElementById(id);
     // Themes: chosen from the round button left of the title. <head> applies the saved one before first paint.
     const THEME_KEY='plCalc.theme';
