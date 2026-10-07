@@ -77,6 +77,9 @@
     .btn-kp:active { transform: scale(0.98); }
     .btn-kp svg { width: 15px; height: 15px; opacity: 0.85; }
     .keypad { z-index: 0; padding: 14px; }  /* below the main card so the Clear Fields menu can overlap it */
+    /* the keypad sits over the page while you type: a strong frost, and a tint dense enough that the result stays unreadable
+       behind it even where the blur isn't drawn */
+    .keypad { background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02) 120px), rgba(10,8,26,0.985); -webkit-backdrop-filter: blur(32px) saturate(140%); backdrop-filter: blur(32px) saturate(140%); }
     .keypad[hidden] { display: none; }
     /* typing: the keypad pins to the bottom edge so it's always fully reachable, whatever the screen height.
        A spacer keeps the same amount of scrollable room, so nothing below it jumps. */
@@ -195,6 +198,7 @@
     /* bevel: catches the light at the top left, a faint bounce at the bottom right */
     html[data-theme="glass"] .card::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(152deg, rgba(255,255,255,0.78), rgba(255,255,255,0.18) 18%, rgba(255,255,255,0.05) 42%, rgba(255,255,255,0.03) 72%, rgba(255,255,255,0.16)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; display: block; }
     html[data-theme="glass"] .card::after { display: none; }
+    html[data-theme="glass"] .keypad { background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02) 120px), rgba(14,14,16,0.985); -webkit-backdrop-filter: blur(32px) saturate(130%); backdrop-filter: blur(32px) saturate(130%); }
     html[data-theme="glass"] .logo h1 { background: none; -webkit-text-fill-color: #fff; color: #fff; letter-spacing: -0.2px; }
     html[data-theme="glass"] .logo p, html[data-theme="glass"] .field label { color: rgba(235,235,245,0.62); }
     /* fields: recessed wells, with the lip of the recess catching light underneath */
@@ -251,62 +255,60 @@
       html[data-theme="glass"] .cur-toggle:hover { border-color: rgba(255,255,255,0.14); }
     }
 
-    /* ===== Theme: Minimal White (after CRED's NeoPOP: black on white, sharp corners, 3D buttons that plunk) ===== */
-    html[data-theme="minimal"] { background: #f2f3f5; color-scheme: light; --flash: rgba(20,76,199,0.14); --bubble: rgba(16,18,24,0.34); }
-    html[data-theme="minimal"] body { background: #f2f3f5; color: #101114; }
+    /* ===== Theme: Minimal White (white frosted glass, CRED's NeoPOP kept for the one primary button) =====
+       Minimal: a clean white page, no shapes, just the rising bubbles. Glassy: the bubbles show softly through clear
+       frosted panels with a crisp white rim, which is what makes glass read as glass. One bold accent: Calculate. */
+    html[data-theme="minimal"] { background: #f6f7f9; color-scheme: light; --flash: rgba(20,76,199,0.14); --bubble: rgba(40,46,60,0.42); }
+    html[data-theme="minimal"] body { background: #f6f7f9; color: #101114; }
     html[data-theme="minimal"] body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: #101114; z-index: 20; pointer-events: none; }  /* home-screen app: keeps the white status-bar text readable */
-    html[data-theme="minimal"] .aurora { background:
-      linear-gradient(108deg, transparent 30%, rgba(16,18,24,0.07) 38%, rgba(16,18,24,0.12) 43%, rgba(16,18,24,0.055) 50%, transparent 59%),
-      radial-gradient(38% 32% at 16% 12%, rgba(16,18,24,0.11), transparent 72%),
-      radial-gradient(36% 30% at 88% 74%, rgba(16,18,24,0.1), transparent 72%); }
-    html[data-theme="minimal"] .aurora::before, html[data-theme="minimal"] .aurora::after { display: none; }
-    html[data-theme="minimal"] .card { background: rgba(255,255,255,0.7); -webkit-backdrop-filter: blur(24px) saturate(115%); backdrop-filter: blur(24px) saturate(115%); border: 1px solid rgba(16,18,24,0.1); border-radius: 0; box-shadow: inset 0 1px 0 #fff; }
+    html[data-theme="minimal"] .aurora, html[data-theme="minimal"] .aurora::before, html[data-theme="minimal"] .aurora::after { background: none; }
+    /* the panel: clear frost, white rim inside a faint hairline outside, a soft lift */
+    html[data-theme="minimal"] .card { background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.32)); -webkit-backdrop-filter: blur(3px) saturate(170%); backdrop-filter: blur(3px) saturate(170%); border: 1px solid rgba(255,255,255,0.95); border-radius: 0; box-shadow: 0 0 0 1px rgba(16,18,24,0.07), inset 0 1px 0 #fff, 0 22px 44px -26px rgba(16,18,24,0.22); }
     html[data-theme="minimal"] .card::before { display: none; }
+    html[data-theme="minimal"] .keypad { background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(250,251,252,0.95)); -webkit-backdrop-filter: blur(30px) saturate(170%); backdrop-filter: blur(30px) saturate(170%); }
     html[data-theme="minimal"] .logo-mark rect, html[data-theme="minimal"] .logo-mark circle { fill: #101114; }
     html[data-theme="minimal"] .logo-mark path { stroke: #101114; }
     html[data-theme="minimal"] .logo h1 { background: none; -webkit-text-fill-color: #101114; color: #101114; font-family: ui-serif, 'New York', Georgia, 'Times New Roman', serif; font-size: 18px; letter-spacing: -0.2px; }
-    html[data-theme="minimal"] .logo p { color: rgba(16,18,24,0.62); }
-    html[data-theme="minimal"] .field label { color: rgba(16,18,24,0.66); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
-    html[data-theme="minimal"] .field input { background: transparent; border: none; border-bottom: 1.5px solid #101114; border-radius: 0; padding-left: 18px; color: #101114; font-size: 16px; font-weight: 600; caret-color: #144cc7; }
+    html[data-theme="minimal"] .logo p { color: rgba(16,18,24,0.6); }
+    html[data-theme="minimal"] .field label { color: rgba(16,18,24,0.62); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+    html[data-theme="minimal"] .field input { background: transparent; border: none; border-bottom: 1px solid rgba(16,18,24,0.22); border-radius: 0; padding-left: 18px; color: #101114; font-size: 16px; font-weight: 600; caret-color: #144cc7; -webkit-backdrop-filter: none; backdrop-filter: none; }
     html[data-theme="minimal"] .field input::placeholder { color: rgba(16,18,24,0.26); }
-    html[data-theme="minimal"] .field input:focus, html[data-theme="minimal"] .field input.kp-target { border-color: #144cc7; box-shadow: 0 1.5px 0 #144cc7; }
-    html[data-theme="minimal"] .field .prefix { left: 0; font-size: 16px; font-weight: 600; color: rgba(16,18,24,0.36); }
+    html[data-theme="minimal"] .field input:focus, html[data-theme="minimal"] .field input.kp-target { border-bottom-color: #144cc7; box-shadow: 0 1px 0 #144cc7; }
+    html[data-theme="minimal"] .field .prefix { left: 0; font-size: 16px; font-weight: 600; color: rgba(16,18,24,0.34); }
     html[data-theme="minimal"] .field input:focus ~ .prefix, html[data-theme="minimal"] .field input:not(:placeholder-shown) ~ .prefix, html[data-theme="minimal"] .field input.kp-target ~ .prefix { color: #101114; }
-    /* NeoPOP buttons: a flat face plus a 3px right edge and bottom edge slanted at 45deg; pressing plunks the face into them */
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key) { border-radius: 0; overflow: visible; box-shadow: none; transition: transform 0.12s ease-in-out; }
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::before, html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::after { content: ''; position: absolute; pointer-events: none; transform-origin: 0 0; transition: transform 0.12s ease-in-out; }
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::before { top: -1px; right: -4px; bottom: auto; left: auto; width: 3px; height: calc(100% + 2px); background: var(--edge-r); transform: skewY(45deg); }
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key)::after { left: -1px; bottom: -4px; top: auto; right: auto; width: calc(100% + 2px); height: 3px; background: var(--edge-b); transform: skewX(45deg); }
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active) { transform: translate(3px, 3px); }
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::before { transform: skewY(45deg) scaleX(0); }
-    html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active)::after { transform: skewX(45deg) scaleY(0); }
-    html[data-theme="minimal"] .btn { background: #101114; color: #fff; border: 1px solid #101114; --edge-r: #8d9099; --edge-b: #3f4248; margin-top: 10px; font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
-    html[data-theme="minimal"] .btn.sweep::after { animation: none; }
-    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { background: rgba(255,255,255,0.86); color: #101114; border: 1px solid #101114; --edge-r: #e3e5e9; --edge-b: #8d9099; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
-    html[data-theme="minimal"] .clear-wrap, html[data-theme="minimal"] .btn-kp { margin-top: 10px; }
-    html[data-theme="minimal"] .kp-key { background: rgba(255,255,255,0.86); color: #101114; border: 1px solid #101114; --edge-r: #e3e5e9; --edge-b: #8d9099; font-weight: 600; }
-    html[data-theme="minimal"] .kp-key.kp-fn { background: #101114; color: #fff; border-color: #101114; --edge-r: #8d9099; --edge-b: #3f4248; }
-    html[data-theme="minimal"] .kp-key.pressed { background: #fff; border-color: #101114; }
-    html[data-theme="minimal"] .field input { -webkit-backdrop-filter: none; backdrop-filter: none; }
-    html[data-theme="minimal"] .kp-key.kp-fn.pressed { background: #101114; }
+    /* glass tiles for keys and secondary buttons: no black outline, no 3D edge, just a hairline and a white top light */
+    html[data-theme="minimal"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn) { background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.62)); color: #101114; border: 1px solid rgba(16,18,24,0.08); border-radius: 0; box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(16,18,24,0.05); }
+    html[data-theme="minimal"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn).pressed { background: rgba(16,18,24,0.07); transition-duration: 0s; }
+    html[data-theme="minimal"] .btn-clear, html[data-theme="minimal"] .btn-kp { font-size: 12px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+    html[data-theme="minimal"] .clear-wrap, html[data-theme="minimal"] .btn-kp { margin-top: 8px; }
+    html[data-theme="minimal"] .kp-key { font-weight: 500; }
+    html[data-theme="minimal"] .kp-key.kp-fn { background: rgba(255,255,255,0.32); }
     html[data-theme="minimal"] .ripple { display: none; }
-    html[data-theme="minimal"] .kp-grid { gap: 10px; }
-    html[data-theme="minimal"] .clear-menu, html[data-theme="minimal"] .theme-menu { background: rgba(255,255,255,0.94); -webkit-backdrop-filter: blur(20px) saturate(118%); backdrop-filter: blur(20px) saturate(118%); border: 1px solid #101114; border-radius: 0; box-shadow: 4px 4px 0 #101114; }
+    html[data-theme="minimal"] .kp-grid { gap: 8px; }
+    /* the one bold accent: CRED's NeoPOP primary, a black face with 3px slanted edges that plunks when pressed */
+    html[data-theme="minimal"] .btn { background: #101114; color: #fff; border: 1px solid #101114; border-radius: 0; overflow: visible; box-shadow: none; --edge-r: #8d9099; --edge-b: #3f4248; margin-top: 12px; font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; transition: transform 0.12s ease-in-out; }
+    html[data-theme="minimal"] .btn::before, html[data-theme="minimal"] .btn::after { content: ''; position: absolute; pointer-events: none; transform-origin: 0 0; transition: transform 0.12s ease-in-out; }
+    html[data-theme="minimal"] .btn::before { top: -1px; right: -4px; bottom: auto; left: auto; width: 3px; height: calc(100% + 2px); background: var(--edge-r); transform: skewY(45deg); }
+    html[data-theme="minimal"] .btn::after { left: -1px; bottom: -4px; top: auto; right: auto; width: calc(100% + 2px); height: 3px; background: var(--edge-b); transform: skewX(45deg); }
+    html[data-theme="minimal"] .btn:is(.pressed, :active) { transform: translate(3px, 3px); }
+    html[data-theme="minimal"] .btn:is(.pressed, :active)::before { transform: skewY(45deg) scaleX(0); }
+    html[data-theme="minimal"] .btn:is(.pressed, :active)::after { transform: skewX(45deg) scaleY(0); }
+    html[data-theme="minimal"] .btn.sweep::after { animation: none; }
+    html[data-theme="minimal"] .clear-menu, html[data-theme="minimal"] .theme-menu { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%); border: 1px solid rgba(255,255,255,0.95); border-radius: 0; box-shadow: 0 0 0 1px rgba(16,18,24,0.08), 0 18px 40px -16px rgba(16,18,24,0.25); }
     html[data-theme="minimal"] .clear-menu button, html[data-theme="minimal"] .theme-menu button { color: #101114; border-radius: 0; }
-    html[data-theme="minimal"] .clear-menu .divider { background: #e3e5e9; }
-    html[data-theme="minimal"] .clear-menu button.hot { background: #eef0f3; color: #101114; }
+    html[data-theme="minimal"] .clear-menu .divider { background: rgba(16,18,24,0.08); }
+    html[data-theme="minimal"] .clear-menu button.hot { background: rgba(16,18,24,0.05); color: #101114; }
     html[data-theme="minimal"] .clear-menu button.clear-all { color: #d63a24; }
     html[data-theme="minimal"] .clear-menu button.clear-all.hot { background: #fdecea; color: #d63a24; }
-    html[data-theme="minimal"] .theme-menu .swatch { border-radius: 0; box-shadow: 0 0 0 1px #101114; }
+    html[data-theme="minimal"] .theme-menu .swatch { border-radius: 0; box-shadow: 0 0 0 1px rgba(16,18,24,0.2); }
     html[data-theme="minimal"] .theme-menu .check { color: #101114; }
-    html[data-theme="minimal"] .theme-btn { border-radius: 0; border-color: #101114; background: rgba(255,255,255,0.78); color: #101114; }
-    html[data-theme="minimal"] .cur-toggle { background: rgba(255,255,255,0.78); border-color: #101114; border-radius: 0; }
+    html[data-theme="minimal"] .cur-toggle { background: rgba(255,255,255,0.7); border: 1px solid rgba(16,18,24,0.1); border-radius: 0; box-shadow: inset 0 1px 0 #fff; }
     html[data-theme="minimal"] .cur-toggle::before { background: #101114; border-radius: 0; box-shadow: none; }
-    html[data-theme="minimal"] .cur-toggle span { border-radius: 0; color: rgba(13,13,13,0.5); }
+    html[data-theme="minimal"] .cur-toggle span { border-radius: 0; color: rgba(16,18,24,0.5); }
     html[data-theme="minimal"] .cur-toggle span.on { color: #fff; }
     html[data-theme="minimal"] .error-msg { color: #d63a24; }
     html[data-theme="minimal"] .result { border-radius: 0; }
-    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: rgba(255,255,255,0.7); border: 1px solid rgba(16,18,24,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9); }
+    html[data-theme="minimal"] .result.profit, html[data-theme="minimal"] .result.loss, html[data-theme="minimal"] .result.neutral { background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.55)); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 0 0 1px rgba(16,18,24,0.07), inset 0 1px 0 #fff; }
     html[data-theme="minimal"] .result.profit { border-top: 3px solid #06c270; }
     html[data-theme="minimal"] .result.loss { border-top: 3px solid #ee4d37; }
     html[data-theme="minimal"] .result.neutral { border-top: 3px solid #101114; }
@@ -318,21 +320,24 @@
     html[data-theme="minimal"] .result-icon { border-radius: 0; }
     html[data-theme="minimal"] .profit .result-icon { background: rgba(6,194,112,0.12); color: #06c270; }
     html[data-theme="minimal"] .loss .result-icon { background: rgba(238,77,55,0.12); color: #ee4d37; }
-    html[data-theme="minimal"] .neutral .result-icon { background: #eef0f3; color: #101114; }
-    html[data-theme="minimal"] .detail-box { background: rgba(16,18,24,0.045); border-radius: 0; }
-    html[data-theme="minimal"] .detail-box .dl { color: rgba(16,18,24,0.62); }
+    html[data-theme="minimal"] .neutral .result-icon { background: rgba(16,18,24,0.05); color: #101114; }
+    html[data-theme="minimal"] .detail-box { background: rgba(16,18,24,0.04); border-radius: 0; }
+    html[data-theme="minimal"] .detail-box .dl { color: rgba(16,18,24,0.6); }
     html[data-theme="minimal"] .detail-box .dv { color: #101114; }
     html[data-theme="minimal"] ::selection { background: rgba(20,76,199,0.2); }
+    /* more bubbles on white: the extra ones only show in this theme */
+    .bg-particles span:nth-child(n+71) { display: none; }
+    html[data-theme="minimal"] .bg-particles span:nth-child(n+71) { display: block; }
     @media (hover: hover) {
       html[data-theme="minimal"] .card:not(.keypad):hover { transform: none; }
       html[data-theme="minimal"] .btn:hover { transform: none; box-shadow: none; }
       html[data-theme="minimal"] .btn:hover::after { transform: skewX(45deg); }
-      html[data-theme="minimal"] .btn-clear:hover, html[data-theme="minimal"] .btn-kp:hover, html[data-theme="minimal"] .kp-key:hover, html[data-theme="minimal"] .theme-btn:hover { background: #f7f8fa; border-color: #101114; }
-      html[data-theme="minimal"] .kp-key.kp-fn:hover { background: #282a2e; }
-      html[data-theme="minimal"] .clear-menu button:hover, html[data-theme="minimal"] .theme-menu button:hover { background: #eef0f3; color: #101114; }
+      html[data-theme="minimal"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn):hover { background: linear-gradient(180deg, #fff, rgba(255,255,255,0.78)); border-color: rgba(16,18,24,0.14); }
+      html[data-theme="minimal"] :is(.btn-clear, .btn-kp, .kp-key, .theme-btn).pressed { background: rgba(16,18,24,0.07); }
+      html[data-theme="minimal"] .clear-menu button:hover, html[data-theme="minimal"] .theme-menu button:hover { background: rgba(16,18,24,0.05); color: #101114; }
       html[data-theme="minimal"] .clear-menu button.clear-all:hover { background: #fdecea; color: #d63a24; }
-      html[data-theme="minimal"] .cur-toggle:hover { border-color: #101114; }
-      html[data-theme="minimal"] :is(.btn, .btn-clear, .btn-kp, .kp-key):is(.pressed, :active) { transform: translate(3px, 3px); }
+      html[data-theme="minimal"] .cur-toggle:hover { border-color: rgba(16,18,24,0.2); }
+      html[data-theme="minimal"] .btn:is(.pressed, :active) { transform: translate(3px, 3px); }
     }
     @media (max-width: 360px) { html[data-theme="minimal"] .logo h1 { font-size: 16px; } }
     @media (max-width: 330px) { html[data-theme="minimal"] .logo h1 { font-size: 14px; } }
@@ -394,14 +399,14 @@
   <div class="kp-space" id="kpSpace" aria-hidden="true"></div>
   <div class="theme-veil" id="themeVeil" aria-hidden="true"></div>
   <script>
-    (()=>{const c=document.getElementById('particles');for(let i=0;i<70;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';const dur=6+Math.random()*10;s.style.animationDuration=dur+'s';s.style.animationDelay=-Math.random()*dur+'s';/* negative delay: already mid-rise at load, so there is no empty wait */s.style.width=s.style.height=(3+Math.random()*5)+'px';c.appendChild(s);}})();
+    (()=>{const c=document.getElementById('particles');for(let i=0;i<140;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';const dur=6+Math.random()*10;s.style.animationDuration=dur+'s';s.style.animationDelay=-Math.random()*dur+'s';/* negative delay: already mid-rise at load, so there is no empty wait */s.style.width=s.style.height=(3+Math.random()*5)+'px';c.appendChild(s);}})();
     const $=id=>document.getElementById(id);
     // Themes: chosen from the round button left of the title. <head> applies the saved one before first paint.
     const THEME_KEY='plCalc.theme';
     const THEMES=[
       {id:'midnight',name:'Midnight',meta:'#05040d',swatch:['#100d2b','#a78bfa']},
       {id:'glass',name:'Black Glass',meta:'#000000',swatch:['#000000','#0a84ff']},
-      {id:'minimal',name:'Minimal White',meta:'#f2f3f5',swatch:['#ffffff','#101114']},
+      {id:'minimal',name:'Minimal White',meta:'#f6f7f9',swatch:['#ffffff','#101114']},
     ];
     const themeBtn=$('themeBtn'),themeMenu=$('themeMenu');
     THEMES.forEach(t=>{const b=document.createElement('button');b.type='button';b.dataset.themeId=t.id;b.setAttribute('role','menuitemradio');b.innerHTML=`<span class="swatch" style="--a:${t.swatch[0]};--b:${t.swatch[1]}"></span><span>${t.name}</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;themeMenu.append(b);});
